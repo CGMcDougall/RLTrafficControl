@@ -18,6 +18,8 @@ def main():
     Size = 50;
     Lanes =2;
 
+    #renderMode     //FOR determining how much hud should be rendered
+    mode = 1
 
     #Screen Setup
     background_colour = (10,10,220)
@@ -67,11 +69,11 @@ def main():
         v.draw()
 
 
-        if hud: 
-            Mat.draw(screen)
+
+        Mat.draw(screen,mode)
 
 
-        c.act(dt)
+        c.act(dt,Mat)
         c.draw(screen)
 
         #for events like key clicking
@@ -79,6 +81,8 @@ def main():
             
             if event.type == pg.KEYUP:
                 if pg.K_TAB:
+                    mode += 1
+                    mode = mode % 3
                     hud = not hud
 
             if event.type == pg.QUIT:
