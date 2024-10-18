@@ -3,6 +3,8 @@ import pygame as pg
 
 class storage:
 
+#WEEELLL
+
     #init storage matrices to track locations of cars with 0,1 values 
     def __init__(self,width,height, Size = 50, Lanes = 2):
         self.lanes = Lanes
