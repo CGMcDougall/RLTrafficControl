@@ -13,7 +13,7 @@ from Traffic_env.envs import Visual
 #return change in time and new real time
 def time_consistency(oldtime : float):
     dt = (time.time()-oldtime)
-    return dt, (oldtime + dt) 
+    return dt, (oldtime + dt)
 
 
 
@@ -56,6 +56,12 @@ def main():
         v.draw()
 
         pg.display.flip()
+        for event in pg.event.get():
+        # check if the event is the X button
+            if event.type==pg.QUIT:
+            # if it is quit the game
+                pg.quit()
+                exit(0)
 
 
 
