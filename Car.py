@@ -1,6 +1,6 @@
 import pygame as pg
 
-import Matricies
+from Traffic_env.envs import Matricies
 import numpy as np
 
 #car class

@@ -2,6 +2,7 @@ import random
 from enum import Enum, IntEnum
 import pygame as pg
 import Matricies as mat
+from Traffic_env.envs import Matricies as mat
 import gymnasium as gym
 from gymnasium import spaces
 

@@ -19,17 +19,17 @@ class visuals:
 
     lightScale = (100,100)
 
-    GreenNW = pg.image.load("Assets/GreenNW.png")
+    GreenNW = pg.image.load("Assets/VGreen.png")
     GreenNW = pg.transform.scale(GreenNW, lightScale)
-    GreenSE = pg.image.load("Assets/GreenSE.png")
+    GreenSE = pg.image.load("Assets/HGreen.png")
     GreenSE = pg.transform.scale(GreenSE, lightScale)
 
-    YellowSE = pg.image.load("Assets/YellowSE.png")
+    YellowSE = pg.image.load("Assets/HYellow.png")
     YellowSE = pg.transform.scale(YellowSE, lightScale)
-    YellowNW = pg.image.load("Assets/YellowNW.png")
+    YellowNW = pg.image.load("Assets/VYellow.png")
     YellowNW = pg.transform.scale(YellowNW, lightScale)
 
-    RedNWSE = pg.image.load("Assets/RedNWSE.png")
+    RedNWSE = pg.image.load("Assets/AllRed.png")
     RedNWSE = pg.transform.scale(RedNWSE,lightScale)
 
     curLight = None
