@@ -1,91 +1,58 @@
 import random
-from enum import Enum, IntEnum
+from enum import Enum
 import pygame as pg
-import Matricies as mat
+from Traffic_env.envs import Matricies as mat
 import gymnasium as gym
 from gymnasium import spaces
 
 import numpy as np
 
 from Traffic_env.envs import Visual
+from Traffic_env.envs.Visual import LightAction
 
-
-##Possible Actions for agent to take
-class LightAction(IntEnum):
-    NWgreen = 0
-    NWyellow =1
-    SEgreen = 2
-    SEyellow =3
-    FullRed = 4
-
-
-##Possible "tiles" (locations) that the env can have
-class Tile(Enum):
-    Empty = 0
-    Car = 1
-    Intersection = 2
-    nan = 3
-
-    #Print the first 2 charaters of the name
-    def __str__(self):
-        return self.name[:3]
-
-
-
+# Possible Actions the agent can take
+class Actions(Enum):
+    STAY = 0
+    SWITCH = 1
 
 #Class that functions as the enviroment
 class IntersectionControl:
 
-    def __init__(self,size = 50):
+    def __init__(self,v: Visual.visuals,size = 50):
         self.lanes = 2
         self.size = size
-        # self.gridRows = 50
-        # self.gridCols = 50
+        self.visual = v
+
+        # Since the lights must change in a specific order, I figured I'd just hardcode them in
+        self.action_loop = [LightAction.V_GREEN, 
+                            LightAction.V_YELLOW, 
+                            LightAction.ALL_RED, 
+                            LightAction.H_GREEN, 
+                            LightAction.H_YELLOW, 
+                            LightAction.ALL_RED]
 
         self.mat = mat.storage(700,700,size,self.lanes)
         self.reset()
 
-        #IDK defualt i geuss
-        self.curAction = LightAction.NWgreen
+    def reset(self):
+        self.curAction = Actions.STAY
+        self.curLight = 0
+        self.cars = []
 
-
-
-    def reset(self,seed=None):
-        self.lightPos = [self.size/2,self.size/2]
-
-
-
-    ##IF switch == true, swap to next stage of light, and return curAction
-    def action(self,switch:bool) -> LightAction:
-
-        cur = self.curAction
-
-
-        if switch:
-            if cur == LightAction.NWgreen:
-                self.curAction = LightAction.NWyellow
-            elif cur == LightAction.NWyellow:
-                self.curAction = LightAction.FullRed
-
-            elif cur == LightAction.FullRed:
-                self.curAction = LightAction.SEgreen
-
-
-            elif cur == LightAction.SEgreen:
-                self.curAction = LightAction.SEyellow
+    # IF the agent is taking the SWITCH action, swap to next stage of light
+    def action(self):
+        if self.curAction == Actions.SWITCH:
+            if self.curLight == len(self.action_loop) - 1:
+                self.curLight = 0
             else:
-                self.curAction = LightAction.NWgreen
-        return self.curAction
+                self.curLight += 1
 
-
-    #Just call storage.draw for now
-    def render(self, screen: pg.Surface):
-        self.mat.draw(screen)
-
+    def render(self):
+        self.visual.draw()
 
 ##DEMO main function for small testing, use main usually
 if __name__=="__main__":
-    background_colour = (10, 10, 220)
+    background_colour = (10, 10, 10)
     (width, height) = (700, 700)
     screen = pg.display.set_mode((width, height))
     pg.display.set_caption('Demo')

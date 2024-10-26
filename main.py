@@ -1,27 +1,24 @@
 import random
 
 import pygame as pg
-import time, Car, Intersection
+import time, Car
+from Car import CarDirs
 
 import numpy as np
-import Matricies as mat
-#from Traffic_env.envs import grid_world as env
+from Traffic_env.envs import Matricies as mat
 from Traffic_env.envs import MonoIntersection as env
+from Traffic_env.envs.MonoIntersection import Actions
 from Traffic_env.envs import Visual
-
 
 #return change in time and new real time
 def time_consistency(oldtime : float):
     dt = (time.time()-oldtime)
     return dt, (oldtime + dt)
 
-
-
-
 def main():
     #Screen Setup
-    background_colour = (10, 10, 220)
-    (width, height) = (700, 700)
+    background_colour = (120, 120, 120)
+    (width, height) = (700, 700) # Should probably set this as a const somewhere
     screen = pg.display.set_mode((width, height))
     pg.display.set_caption('Demo')
     running = True
@@ -35,25 +32,45 @@ def main():
     oldtime = time.time()
     fps = 60
 
-    #Enviroment SetUp
-    monoInt = env.IntersectionControl(Size)
-
     #Viusal Setup
     v = Visual.visuals(screen,width,height,Size,Lanes)
 
+    #Enviroment SetUp
+    monoInt = env.IntersectionControl(v,Size)
+
     while running:
+        clock.tick(fps) # This is how it's supposed to be done but may or may not be useful to us
+        dt, time_cons = time_consistency(oldtime) # Not a real dt, being used to track time between light switches, should probably be renamed for clarity
         screen.fill(background_colour)
 
-        # idk random switch for now
-        r = random.randint(0, 200)
-        rand_action = (r == 0)
+        # Switch lights every 10 seconds for now
+        if dt >= 1:
+            monoInt.curAction = Actions.SWITCH
+            oldtime = time_cons
+        else:
+            monoInt.curAction = Actions.STAY
+        monoInt.action()
+        monoInt.render()
 
+        # Every frame there's a chance to spawn a car coming from a random direction
+        rand_num = random.randint(0,800)
+        if rand_num == 1:
+            monoInt.cars.append(Car.car(CarDirs.UP))
+        elif rand_num == 2:
+            monoInt.cars.append(Car.car(CarDirs.DOWN))
+        elif rand_num == 3:
+            monoInt.cars.append(Car.car(CarDirs.LEFT))
+        elif rand_num == 4:
+            monoInt.cars.append(Car.car(CarDirs.RIGHT))
+        
+        # Loop through every car in existence and move it
+        # Eventually there should be a way to check if a car has moved off screen and delete it
+        for car in monoInt.cars:
+            car.act(monoInt.mat)
+            car.draw(screen)
 
-        monoInt.action(rand_action)
-        monoInt.render(screen)
-
-        v.lights(int(monoInt.curAction))
-        v.draw()
+        # Update light display
+        v.lights(monoInt.action_loop[monoInt.curLight])
 
         pg.display.flip()
         for event in pg.event.get():
@@ -63,91 +80,17 @@ def main():
                 pg.quit()
                 exit(0)
 
-
-
-# def main():
-#
-#     #Important Setup
-#     Size = 50;
-#     Lanes =2;
-#
-#     #renderMode     //FOR determining how much hud should be rendered
-#     mode = 1
-#
-#     #Screen Setup
-#     background_colour = (10,10,220)
-#     (width, height) = (700, 700)
-#     screen = pg.display.set_mode((width, height))
-#     pg.display.set_caption('Demo')
-#
-#     Mat = mat.storage(width,height,Size, Lanes)
-#
-#     #time setup
-#     clock = pg.time.Clock()
-#     oldtime = time.time()
-#     fps = 60
-#
-#     #Intersection
-#     I = Intersection.intersection()
-#
-#     #Visual Elements
-#     v = Visual.visuals(screen,width,height,Size,Lanes)
-#
-#
-#     #pg.rect(screen,(0,0,0),Car)
-#     print(Mat.locConversion(0,0))
-#     c = Car.car(Mat.locConversion(0,0))
-#
-#
-#     running = True
-#
-#     hud = True
-#
-#     #Main Engine Loop
-#     while running:
-#
-#         # time (for consistence across devices)
-#         clock.tick(fps)
-#         dt, oldtime = time_consistency(oldtime)
-#
-#
-#         #Required to "clean Screen"
-#         screen.fill(background_colour)
-#
-#         #Check Update intersection
-#         nw, se = I.act(dt)
-#
-#         #Base layer should be visuals
-#         v.lights(nw,se)
-#         v.draw()
-#
-#
-#
-#         Mat.draw(screen,mode)
-#
-#
-#         c.act(dt,Mat)
-#         c.draw(screen)
-#
-#         #for events like key clicking
-#         for event in pg.event.get():
-#
-#             if event.type == pg.KEYUP:
-#                 if pg.K_TAB:
-#                     mode += 1
-#                     mode = mode % 3
-#                     hud = not hud
-#
-#             if event.type == pg.QUIT:
-#                 running = False
-#
-#
-#         #Required to render
-#         pg.display.flip()
-
+        for event in pg.event.get():
+            # check if the event is the X button
+            if event.type==pg.QUIT:
+                # if it is quit the game
+                pg.quit()
+                exit(0)
 
 if __name__ == "__main__":
-    main()
+    main() # The code beneath with the world env stuff does eventually need to work I think
+    # Just for project requirements and whatnot, but low prio
+
     # e = env.GridWorldEnv("human")
     # while True:
     #     e.render()
