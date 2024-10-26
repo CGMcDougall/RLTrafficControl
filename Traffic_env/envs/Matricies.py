@@ -35,4 +35,17 @@ class storage:
             for j in range(int(self.yLen/2-self.lanes/2), int(self.yLen/2+self.lanes/2)):
                 self.matrix[j,i] = Tile.ROAD
 
+# Potentially useful helper functions - modify and delete as appropriate
+def indexToCord(self,i,j):
+    x = i * (self.width / self.xLen) + self.offsetX
+    y = j * (self.height / self.yLen) + self.offsetY
+    return (x,y)
 
+def getAt(self,x,y):
+    x = x - self.offsetX
+    x = x * (self.xLen/self.width)
+
+    y = y - self.offsetY
+    y = y * (self.yLen/self.height)
+
+    return x,y
