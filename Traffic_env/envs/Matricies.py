@@ -59,6 +59,9 @@ class storage:
 
         return n
 
+    #Blank function for reward calculation assistance
+    def getCars(self):
+        return
 # Potentially useful helper functions - modify and delete as appropriate
 def indexToCord(self,i,j):
     x = i * (self.width / self.xLen) + self.offsetX
