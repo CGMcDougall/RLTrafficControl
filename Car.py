@@ -4,6 +4,9 @@ from enum import Enum
 from Traffic_env.envs import Matricies
 import numpy as np
 
+from Traffic_env.envs.Visual import LightAction
+
+
 class CarDirs(Enum):
     LEFT = 0
     UP = 1
@@ -14,6 +17,7 @@ class CarDirs(Enum):
 class car:
     speed = 0.05
     color = (250,250,250,1)
+    driving = True
 
     # Initialize a screen position, matrix location, and direction
     def __init__(self, start_dir):
@@ -40,6 +44,10 @@ class car:
         pg.draw.rect(s,self.color,self.Car)
 
     def act(self, mat : Matricies):
+        #print("begin of act")
+        if self.driving == False:
+            return
+
         # Speed and dt are no longer used, which I think is fine because I'm calling tick with an fps in main?
         # But can look more into that later, also low prio
         self.Car = self.Car.move(self.dir)
@@ -51,6 +59,48 @@ class car:
     # A function to get clamped (int) value for location in matrix
     def getMatPos(self):
         return int(self.loc[1]), int(self.loc[0])
+
+
+
+
+
+    #Stops the car if at an intersections and light phase is red/yellow
+    def atLight(self, mat : Matricies, phase):
+        IBX = mat.IBX
+        IBY = mat.IBY
+
+        if abs(self.dir[0]) == 1 and phase == LightAction.H_GREEN:
+            self.driving = True
+            return
+        if abs(self.dir[1]) == 1 and phase == LightAction.V_GREEN:
+            self.driving = True
+            return
+
+
+        if self.dir == [1.0,0.0]:
+            if(self.loc[0] == (IBX[0]-1)):
+                self.driving = False
+        elif self.dir == [-1.0,0.0]:
+            if(self.loc[0] == (IBX[1]-1)):
+                self.driving = False
+                return
+        elif self.dir == [0.0,1.0]:
+
+            if(self.loc[1] == (IBY[0]-1)):
+                self.driving = False
+                return
+        elif self.dir == [0.0,-1.0]:
+
+            if(self.loc[1] == (IBY[1]-1)):
+                self.driving = False
+                return
+
+
+
+
+
+
+
 
 
 

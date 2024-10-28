@@ -27,6 +27,10 @@ class storage:
         self.yLen = int(height/self.size)
         self.matrix = np.full((self.xLen,self.yLen), 2)
 
+        self.IBX = (int(self.xLen/2-self.lanes/2), int(self.xLen/2+self.lanes/2)) #Interection Bounds X
+        self.IBY = (int(self.yLen/2-self.lanes/2), int(self.yLen/2+self.lanes/2)) #Interesction Bounds Y
+
+
         for i in range(self.yLen):
             for j in range(int(self.xLen/2-self.lanes/2), int(self.xLen/2+self.lanes/2)):
                 self.matrix[i,j] = 0
@@ -34,6 +38,26 @@ class storage:
         for i in range(self.xLen):
             for j in range(int(self.yLen/2-self.lanes/2), int(self.yLen/2+self.lanes/2)):
                 self.matrix[j,i] = 0
+
+    #Does x,y have neighbors???? -->>> returns array max[4] min[0] of the neighbors
+    def getNeighbors(self,l: [] ):
+        x = l[0]
+        y = l[1]
+        n = []
+
+        if(x < 0 and x >= self.xLen and y < 0 and y >= self.yLen):
+            return
+
+        if x > 0:
+            n.append(self.matrix[x-1][y])
+        if x < self.xLen:
+            n.append(self.matrix[x + 1][y])
+        if y > 0:
+            n.append(self.matrix[x][y-1])
+        if y < self.yLen:
+            n.append(self.matrix[x][y+1])
+
+        return n
 
 # Potentially useful helper functions - modify and delete as appropriate
 def indexToCord(self,i,j):
@@ -49,4 +73,5 @@ def getAt(self,x,y):
     y = y * (self.yLen/self.height)
 
     return [int(x),int(y)]
+
 
