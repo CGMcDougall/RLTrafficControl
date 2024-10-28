@@ -52,22 +52,59 @@ def main():
         monoInt.action()
         monoInt.render()
 
-        # Every frame there's a chance to spawn a car coming from a random direction
+        # Every frame there's a chance to spawn a car coming from a random direction (CarDirs refers to where it is COMING FROM)
         rand_num = random.randint(0,800)
         if rand_num == 1:
-            monoInt.cars.append(Car.car(CarDirs.UP))
-        elif rand_num == 2:
-            monoInt.cars.append(Car.car(CarDirs.DOWN))
-        elif rand_num == 3:
-            monoInt.cars.append(Car.car(CarDirs.LEFT))
-        elif rand_num == 4:
-            monoInt.cars.append(Car.car(CarDirs.RIGHT))
+            startPos = [0,int(int(height/50)/2)-1]
+            if(monoInt.mat.matrix[startPos[0],startPos[1]] != 1): # Car currently occupies that spot
+                monoInt.mat.matrix[startPos[0],startPos[1]] = 1
+                monoInt.cars.append(Car.car(CarDirs.UP,startPos))
+        # elif rand_num == 2:
+        #     startPos = [int(width/50)-1,int(int(height/50)/2)]
+        #     if(monoInt.mat.matrix[startPos[0],startPos[1]] == 1): # Car currently occupies that spot
+        #         continue
+        #     monoInt.mat.matrix[startPos[0],startPos[1]] = 1
+        #     monoInt.cars.append(Car.car(CarDirs.DOWN,startPos))
+        # elif rand_num == 3:
+        #     startPos = [int(int(height/50)/2),0]
+        #     if(monoInt.mat.matrix[startPos[0],startPos[1]] == 1): # Car currently occupies that spot
+        #         continue
+        #     monoInt.mat.matrix[startPos[0],startPos[1]] = 1
+        #     monoInt.cars.append(Car.car(CarDirs.LEFT,startPos))
+        # elif rand_num == 4:
+        #     startPos = [int(int(height/50)/2)-1,int(height/50)-1]
+        #     if(monoInt.mat.matrix[startPos[0],startPos[1]] == 1): # Car currently occupies that spot
+        #         continue
+        #     monoInt.mat.matrix[startPos[0],startPos[1]] = 1
+        #     monoInt.cars.append(Car.car(CarDirs.RIGHT,startPos))
         
         # Loop through every car in existence and move it
         # Eventually there should be a way to check if a car has moved off screen and delete it
         for car in monoInt.cars:
             car.act(monoInt.mat)
+            print(car.loc)
+            # monoInt.mat.matrix[car.loc[0],car.loc[1]] = 0
+            if car.dir[0] == 0:
+                print("VERTICAL BELOW")
+                print(mat.getAt(monoInt.mat,car.Car.x,car.Car.y))
+                car.loc[1] = mat.getAt(monoInt.mat,car.Car.x,car.Car.y)[0]
+                print(car.loc)
+            else:
+                print("HORIZONTAL")
+                car.loc[0] = mat.getAt(monoInt.mat,car.Car.x,car.Car.y)[0]
+
+            monoInt.mat.matrix[car.loc[1],car.loc[0]] = 1
             car.draw(screen)
+            print(car.loc)
+            # print("WAIT!!!")
+            # time.sleep(2)
+            print(monoInt.mat.matrix)
+            print()
+            # print(car.getMatPos())
+            test = car.getMatPos()
+            # print(mat.indexToCord(monoInt.mat,test[0],test[1]))
+            # print(mat.getAt(monoInt.mat,670.0, 370.0))
+            # print("They don't love you like I love you")
 
         # Update light display
         v.lights(monoInt.action_loop[monoInt.curLight])

@@ -25,15 +25,15 @@ class storage:
         # Initialize as empty tiles, and then fill out the roads with the correct number of lanes
         self.xLen = (int(width/self.size))
         self.yLen = int(height/self.size)
-        self.matrix = np.full((self.xLen,self.yLen), Tile.NAN)
+        self.matrix = np.full((self.xLen,self.yLen), 2)
 
         for i in range(self.yLen):
             for j in range(int(self.xLen/2-self.lanes/2), int(self.xLen/2+self.lanes/2)):
-                self.matrix[i,j] = Tile.ROAD
+                self.matrix[i,j] = 0
 
         for i in range(self.xLen):
             for j in range(int(self.yLen/2-self.lanes/2), int(self.yLen/2+self.lanes/2)):
-                self.matrix[j,i] = Tile.ROAD
+                self.matrix[j,i] = 0
 
 # Potentially useful helper functions - modify and delete as appropriate
 def indexToCord(self,i,j):
@@ -48,4 +48,5 @@ def getAt(self,x,y):
     y = y - self.offsetY
     y = y * (self.yLen/self.height)
 
-    return x,y
+    return [int(x),int(y)]
+

@@ -18,7 +18,7 @@ class car:
     # Initialize a location and direction
     # loc variable has been temporarily removed
     # I'd suggest bringing it back eventually but using it to track matrix location directly
-    def __init__(self, start_dir):
+    def __init__(self, start_dir, loc):
         self.Car = pg.Rect(320,0,20,20)
         self.dir = [0.0,1.0]
         if start_dir == CarDirs.UP:
@@ -33,7 +33,7 @@ class car:
         elif start_dir == CarDirs.DOWN:
             self.Car = pg.Rect(360,700,20,20)
             self.dir = [0.0,-1.0]
-
+        self.loc = loc
     def draw(self,s : pg.surface):
         pg.draw.rect(s,self.color,self.Car)
 
