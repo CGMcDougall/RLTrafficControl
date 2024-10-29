@@ -67,10 +67,9 @@ def main():
         # Eventually there should be a way to check if a car has moved off screen and delete it
         for car in monoInt.cars:
             monoInt.mat.matrix[car.getMatPos()] = 0
-            #print("enter")
+
             car.act(monoInt.mat)
-            #print("exit")
-            car.atLight(monoInt.mat,monoInt.action_loop[monoInt.curLight])
+            car.legalMoveCheck(monoInt.mat,monoInt.action_loop[monoInt.curLight])
 
 
 
@@ -80,7 +79,7 @@ def main():
                 monoInt.mat.matrix[car.getMatPos()] = 1
                 car.draw(screen)
 
-        #print(monoInt.mat.matrix)
+        print(monoInt.mat.matrix)
         # Update light display
         v.lights(monoInt.action_loop[monoInt.curLight])
 

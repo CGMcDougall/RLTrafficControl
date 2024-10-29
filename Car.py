@@ -44,7 +44,8 @@ class car:
         pg.draw.rect(s,self.color,self.Car)
 
     def act(self, mat : Matricies):
-        #print("begin of act")
+
+
         if self.driving == False:
             return
 
@@ -62,6 +63,26 @@ class car:
 
 
 
+    def legalMoveCheck(self,mat : Matricies,phase) ->bool:
+        self.atLight(mat,phase)
+        #self.avaliableSpot(mat)
+        return self.driving
+
+    def avaliableSpot(self, mat :Matricies):
+
+        if(mat.getBordering(self.loc,self.dir) == 1):
+            self.driving = False
+
+        # n = mat.getNeighbors(self.loc)
+        # #print(n)
+        # for a in n:
+        #     movingTo = [self.loc[0] + self.dir[0], self.loc[1] + self.dir[1]]
+        #     #print(a)
+        #     #print(movingTo)
+        #     if a.all(movingTo):
+        #         #Stop
+        #         driving = False
+        #         return
 
 
     #Stops the car if at an intersections and light phase is red/yellow
@@ -75,6 +96,8 @@ class car:
         if abs(self.dir[1]) == 1 and phase == LightAction.V_GREEN:
             self.driving = True
             return
+
+
 
 
         if self.dir == [1.0,0.0]:

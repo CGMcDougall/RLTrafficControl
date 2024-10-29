@@ -40,28 +40,46 @@ class storage:
                 self.matrix[j,i] = 0
 
     #Does x,y have neighbors???? -->>> returns array max[4] min[0] of the neighbors
-    def getNeighbors(self,l: [] ):
-        x = l[0]
-        y = l[1]
+
+    def getBordering(self,loc,dir):
+        x = int(loc[0] + dir[0])
+        y = int(loc[1] + dir[1])
+
+
+        if (x < 0 or x >= self.xLen) or (y < 0 or y >= self.yLen):
+            return 0
+
+        print(self.matrix[x,y])
+        return self.matrix[x,y]
+
+
+    def getNeighbors(self,l: []):
+        x = int(l[0])
+        y = int(l[1])
         n = []
 
-        if(x < 0 and x >= self.xLen and y < 0 and y >= self.yLen):
-            return
+        if(x < 0 and x >= self.xLen) or (y < 0 and y >= self.yLen):
+            return []
 
-        if x > 0:
-            n.append(self.matrix[x-1][y])
-        if x < self.xLen:
-            n.append(self.matrix[x + 1][y])
-        if y > 0:
-            n.append(self.matrix[x][y-1])
-        if y < self.yLen:
-            n.append(self.matrix[x][y+1])
+        #print(x,y)
 
+        if x > 0 and self.matrix[x-1,y] == 1:
+            n += ((x-1,y))
+        if x < self.xLen-1 and self.matrix[x+1,y] == 1:
+            n+= ((x+1,y))
+        if y > 0 and self.matrix[x,y-1] == 1:
+            n+=((x,y-1))
+        if y < self.yLen-1 and self.matrix[x,y+1] == 1:
+            n+=((x,y+1))
+
+        print(n)
         return n
 
     #Blank function for reward calculation assistance
     def getCars(self):
         return
+
+
 # Potentially useful helper functions - modify and delete as appropriate
 def indexToCord(self,i,j):
     x = i * (self.width / self.xLen) + self.offsetX
