@@ -63,15 +63,18 @@ class car:
 
 
 
-    def legalMoveCheck(self,mat : Matricies,phase) ->bool:
-        self.atLight(mat,phase)
-        #self.avaliableSpot(mat)
-        return self.driving
+    def legalMoveCheck(self,mat : Matricies,phase):
+        #print("!!!!!")
+        self.driving = (self.notAtLight(mat,phase) and self.avaliableSpot(mat))
 
     def avaliableSpot(self, mat :Matricies):
 
-        if(mat.getBordering(self.loc,self.dir) == 1):
-            self.driving = False
+        #mat.getNeighbors(self.loc)
+
+        if mat.getBordering(self.loc, self.dir) == 1:
+            return False
+        else:
+            return True
 
         # n = mat.getNeighbors(self.loc)
         # #print(n)
@@ -86,39 +89,38 @@ class car:
 
 
     #Stops the car if at an intersections and light phase is red/yellow
-    def atLight(self, mat : Matricies, phase):
+    def notAtLight(self, mat : Matricies, phase) -> bool:
         IBX = mat.IBX
         IBY = mat.IBY
 
         if abs(self.dir[0]) == 1 and phase == LightAction.H_GREEN:
-            self.driving = True
-            return
+            #self.driving = True
+            return True
         if abs(self.dir[1]) == 1 and phase == LightAction.V_GREEN:
-            self.driving = True
-            return
-
-
-
+            #self.driving = True
+            return True
 
         if self.dir == [1.0,0.0]:
             if(self.loc[0] == (IBX[0]-1)):
-                self.driving = False
+                #self.driving = False
+                return False
         elif self.dir == [-1.0,0.0]:
             if(self.loc[0] == (IBX[1]-1)):
-                self.driving = False
-                return
+                #self.driving = False
+                return False
         elif self.dir == [0.0,1.0]:
 
             if(self.loc[1] == (IBY[0]-1)):
-                self.driving = False
-                return
+                #self.driving = False
+                return False
         elif self.dir == [0.0,-1.0]:
 
             if(self.loc[1] == (IBY[1]-1)):
-                self.driving = False
-                return
+                #self.driving = False
+                return False
 
-
+        else:
+            return True
 
 
 

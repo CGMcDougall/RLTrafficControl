@@ -6,7 +6,9 @@ from enum import Enum
 class Tile(Enum):
     ROAD = 0
     CAR = 1
-    NAN = 2
+    INTER = 2       #Intersection
+    OCC_INTER = 3   #Occupied Intersection
+    NAN = 4
 
 class storage:
     #init storage matrices to track locations of cars with 0,1 values 
@@ -30,14 +32,19 @@ class storage:
         self.IBX = (int(self.xLen/2-self.lanes/2), int(self.xLen/2+self.lanes/2)) #Interection Bounds X
         self.IBY = (int(self.yLen/2-self.lanes/2), int(self.yLen/2+self.lanes/2)) #Interesction Bounds Y
 
-
         for i in range(self.yLen):
             for j in range(int(self.xLen/2-self.lanes/2), int(self.xLen/2+self.lanes/2)):
-                self.matrix[i,j] = 0
+                if(self.IBY[0] <= i and self.IBY[1] > i):
+                    self.matrix[i,j] = 3
+                else:
+                    self.matrix[i,j] = 0
 
         for i in range(self.xLen):
             for j in range(int(self.yLen/2-self.lanes/2), int(self.yLen/2+self.lanes/2)):
-                self.matrix[j,i] = 0
+                if (self.IBX[0] <= i and self.IBX[1] > i):
+                    self.matrix[i, j] = 3
+                else:
+                    self.matrix[j,i] = 0
 
     #Does x,y have neighbors???? -->>> returns array max[4] min[0] of the neighbors
 
@@ -46,34 +53,13 @@ class storage:
         y = int(loc[1] + dir[1])
 
 
+
         if (x < 0 or x >= self.xLen) or (y < 0 or y >= self.yLen):
             return 0
 
-        print(self.matrix[x,y])
-        return self.matrix[x,y]
+        print(self.matrix[y,x])
+        return self.matrix[y,x]
 
-
-    def getNeighbors(self,l: []):
-        x = int(l[0])
-        y = int(l[1])
-        n = []
-
-        if(x < 0 and x >= self.xLen) or (y < 0 and y >= self.yLen):
-            return []
-
-        #print(x,y)
-
-        if x > 0 and self.matrix[x-1,y] == 1:
-            n += ((x-1,y))
-        if x < self.xLen-1 and self.matrix[x+1,y] == 1:
-            n+= ((x+1,y))
-        if y > 0 and self.matrix[x,y-1] == 1:
-            n+=((x,y-1))
-        if y < self.yLen-1 and self.matrix[x,y+1] == 1:
-            n+=((x,y+1))
-
-        print(n)
-        return n
 
     #Blank function for reward calculation assistance
     def getCars(self):
@@ -96,3 +82,18 @@ def getAt(self,x,y):
     return [int(x),int(y)]
 
 
+ # def atLight(self):
+ #        IBX = self.IBX
+ #        IBY = self.IBY
+ #
+ #        if abs(self.dir[0]) == 1 and phase == LightAction.H_GREEN:
+ #            self.driving = True
+ #            return
+ #        if abs(self.dir[1]) == 1 and phase == LightAction.V_GREEN:
+ #            self.driving = True
+ #            return
+ #
+ #        if self.dir[0] == 0:
+ #            self.loc[1] = Matricies.getAt(mat, self.Car.x, self.Car.y)[1]
+ #        else:
+ #            self.loc[0] = Matricies.getAt(mat, self.Car.x, self.Car.y)[0]
