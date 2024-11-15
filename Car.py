@@ -18,25 +18,27 @@ class car:
     speed = 0.05
     color = (250,250,250,1)
     driving = True
+    size =20
+
 
     # Initialize a screen position, matrix location, and direction
     def __init__(self, start_dir):
-        self.Car = pg.Rect(320,0,20,20)
+        self.Car = pg.Rect(320,0,self.size,self.size)
         self.dir = [0.0,1.0]
         if start_dir == CarDirs.UP:
-            self.Car = pg.Rect(320,0,20,20)
+            self.Car = pg.Rect(320,0,self.size,self.size)
             self.dir = [0.0,1.0]
             self.loc = [700/50/2-1,0]
         elif start_dir == CarDirs.LEFT:
-            self.Car = pg.Rect(0,360,20,20)
+            self.Car = pg.Rect(0,360,self.size,self.size)
             self.dir = [1.0,0.0]
             self.loc = [0,700/50/2]
         elif start_dir == CarDirs.RIGHT:
-            self.Car = pg.Rect(700,320,20,20)
+            self.Car = pg.Rect(700,320,self.size,self.size)
             self.dir = [-1.0,0.0]
             self.loc = [700/50-1,700/50/2-1]
         elif start_dir == CarDirs.DOWN:
-            self.Car = pg.Rect(360,700,20,20)
+            self.Car = pg.Rect(360,700,self.size,self.size)
             self.dir = [0.0,-1.0]
             self.loc = [700/50/2,700/50-1]
     
@@ -64,63 +66,37 @@ class car:
 
 
     def legalMoveCheck(self,mat : Matricies,phase):
-        #print("!!!!!")
-        self.driving = (self.notAtLight(mat,phase) and self.avaliableSpot(mat))
 
-    def avaliableSpot(self, mat :Matricies):
+        l = self.notAtLight(mat,phase)
+        i = self.avaliableSpot(mat)
 
-        #mat.getNeighbors(self.loc)
+        self.driving = (l and i) or (self.MoveRegardless(mat,phase))
 
-        if mat.getBordering(self.loc, self.dir) == 1:
+    #If boardering spot doesnt have a car in it (ie x != 1,4), return true
+    def avaliableSpot(self, mat : Matricies) -> bool:
+        if mat.getBordering(self.loc, self.dir) == 1 or mat.getBordering(self.loc, self.dir) == 3:
             return False
-        else:
-            return True
-
-        # n = mat.getNeighbors(self.loc)
-        # #print(n)
-        # for a in n:
-        #     movingTo = [self.loc[0] + self.dir[0], self.loc[1] + self.dir[1]]
-        #     #print(a)
-        #     #print(movingTo)
-        #     if a.all(movingTo):
-        #         #Stop
-        #         driving = False
-        #         return
+        return True
 
 
-    #Stops the car if at an intersections and light phase is red/yellow
-    def notAtLight(self, mat : Matricies, phase) -> bool:
-        IBX = mat.IBX
-        IBY = mat.IBY
+    #If the light is green, or past the light, drive anyway, regardless of light phase
+    def MoveRegardless(self, mat, phase) -> bool:
 
         if abs(self.dir[0]) == 1 and phase == LightAction.H_GREEN:
-            #self.driving = True
             return True
         if abs(self.dir[1]) == 1 and phase == LightAction.V_GREEN:
-            #self.driving = True
             return True
 
-        if self.dir == [1.0,0.0]:
-            if(self.loc[0] == (IBX[0]-1)):
-                #self.driving = False
-                return False
-        elif self.dir == [-1.0,0.0]:
-            if(self.loc[0] == (IBX[1]-1)):
-                #self.driving = False
-                return False
-        elif self.dir == [0.0,1.0]:
+        #If gets this far, keep driving if in intersection, otherwise stop
+        return mat.withinIntersectionBouds(self.loc)
 
-            if(self.loc[1] == (IBY[0]-1)):
-                #self.driving = False
-                return False
-        elif self.dir == [0.0,-1.0]:
 
-            if(self.loc[1] == (IBY[1]-1)):
-                #self.driving = False
-                return False
 
-        else:
-            return True
+
+    # Stops the car if at an intersections and light phase is not green
+    def notAtLight(self,mat,phase):
+        # if bordering road, ie (x < 2, 3), not at intersection
+        return (mat.getBordering(self.loc, self.dir) < 2)
 
 
 

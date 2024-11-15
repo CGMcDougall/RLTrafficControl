@@ -37,6 +37,7 @@ def main():
 
     #Enviroment SetUp
     monoInt = env.IntersectionControl(v,Size)
+    monoInt.cars.append(Car.car(CarDirs.RIGHT))
 
     while running:
         clock.tick(fps) # This is how it's supposed to be done but may or may not be useful to us
@@ -52,8 +53,8 @@ def main():
         monoInt.action()
         monoInt.render()
 
-        # Every frame there's a chance to spawn a car coming from a random direction (CarDirs refers to where it is COMING FROM)
-        rand_num = random.randint(0,800)
+        #Every frame there's a chance to spawn a car coming from a random direction (CarDirs refers to where it is COMING FROM)
+        rand_num = random.randint(0,400)
         if rand_num == 1:
             monoInt.cars.append(Car.car(CarDirs.UP))
         elif rand_num == 2:
@@ -62,11 +63,25 @@ def main():
             monoInt.cars.append(Car.car(CarDirs.LEFT))
         elif rand_num == 4:
             monoInt.cars.append(Car.car(CarDirs.RIGHT))
-        
+
+
+
+       # monoInt.mat.matrix[6,8] = 1
+
+
+
+
         # Loop through every car in existence and move it
         # Eventually there should be a way to check if a car has moved off screen and delete it
         for car in monoInt.cars:
-            monoInt.mat.matrix[car.getMatPos()] = 0
+
+
+            #If Car is within the intersection, set to empty intersection instead of empty road
+            if monoInt.mat.withinIntersectionBouds(car.getMatPos()):
+                monoInt.mat.matrix[car.getMatPos()] = 2
+            else:
+                monoInt.mat.matrix[car.getMatPos()] = 0
+
 
             car.legalMoveCheck(monoInt.mat, monoInt.action_loop[monoInt.curLight])
             car.act(monoInt.mat)
@@ -77,10 +92,13 @@ def main():
             if car.loc[0] >= 700/50 or car.loc[1] >= 700/50 or car.loc[0] < 0 or car.loc[1] < 0:
                 monoInt.cars.remove(car)
             else:
-                monoInt.mat.matrix[car.getMatPos()] = 1
+                if monoInt.mat.withinIntersectionBouds(car.getMatPos()):
+                    monoInt.mat.matrix[car.getMatPos()] = 3
+                else:
+                    monoInt.mat.matrix[car.getMatPos()] = 1
                 car.draw(screen)
 
-        #print(monoInt.mat.matrix)
+        print(monoInt.mat.matrix)
         # Update light display
         v.lights(monoInt.action_loop[monoInt.curLight])
 
