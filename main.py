@@ -18,13 +18,13 @@ def time_consistency(oldtime : float):
 def main():
     #Screen Setup
     background_colour = (120, 120, 120)
-    (width, height) = (700, 700) # Should probably set this as a const somewhere
-    screen = pg.display.set_mode((width, height))
+    screen_size = 700 # Should probably set this as a const somewhere
+    screen = pg.display.set_mode((screen_size, screen_size))
     pg.display.set_caption('Demo')
     running = True
 
     #info setup
-    Size = 50
+    mat_size = 14
     Lanes = 2
 
     #Time Setup
@@ -33,11 +33,10 @@ def main():
     fps = 60
 
     #Viusal Setup
-    v = Visual.visuals(screen,width,height,Size,Lanes)
+    v = Visual.visuals(screen,screen_size,mat_size,Lanes)
 
     #Enviroment SetUp
-    monoInt = env.IntersectionControl(v,Size)
-    monoInt.cars.append(Car.car(CarDirs.RIGHT))
+    monoInt = env.IntersectionControl(v,screen_size,mat_size)
 
     while running:
         clock.tick(fps) # This is how it's supposed to be done but may or may not be useful to us
@@ -53,46 +52,32 @@ def main():
         monoInt.action()
         monoInt.render()
 
-        #Every frame there's a chance to spawn a car coming from a random direction (CarDirs refers to where it is COMING FROM)
+        # Every frame there's a chance to spawn a car coming from a random direction (CarDirs refers to where it is COMING FROM)
         rand_num = random.randint(0,400)
-        if rand_num == 1:
+        if rand_num == 1 and monoInt.mat.matrix[int(700/50/2)-1,0] == 0:
             monoInt.cars.append(Car.car(CarDirs.UP))
-        elif rand_num == 2:
+        elif rand_num == 2 and monoInt.mat.matrix[int(700/50/2),int(700/50)-1] == 0:
             monoInt.cars.append(Car.car(CarDirs.DOWN))
-        elif rand_num == 3:
+        elif rand_num == 3 and monoInt.mat.matrix[0,int(700/50/2)] == 0:
             monoInt.cars.append(Car.car(CarDirs.LEFT))
-        elif rand_num == 4:
+        elif rand_num == 4 and monoInt.mat.matrix[int(700/50)-1,int(700/50/2)-1] == 0:
             monoInt.cars.append(Car.car(CarDirs.RIGHT))
 
-
-
-       # monoInt.mat.matrix[6,8] = 1
-
-
-
-
         # Loop through every car in existence and move it
-        # Eventually there should be a way to check if a car has moved off screen and delete it
         for car in monoInt.cars:
-
-
             #If Car is within the intersection, set to empty intersection instead of empty road
-            if monoInt.mat.withinIntersectionBouds(car.getMatPos()):
+            if monoInt.mat.withinIntersectionBounds(car.getMatPos()):
                 monoInt.mat.matrix[car.getMatPos()] = 2
             else:
                 monoInt.mat.matrix[car.getMatPos()] = 0
 
-
             car.legalMoveCheck(monoInt.mat, monoInt.action_loop[monoInt.curLight])
             car.act(monoInt.mat)
 
-
-
-
-            if car.loc[0] >= 700/50 or car.loc[1] >= 700/50 or car.loc[0] < 0 or car.loc[1] < 0:
+            if car.loc[0] >= monoInt.mat.mat_size or car.loc[1] >= monoInt.mat.mat_size or car.loc[0] < 0 or car.loc[1] < 0:
                 monoInt.cars.remove(car)
             else:
-                if monoInt.mat.withinIntersectionBouds(car.getMatPos()):
+                if monoInt.mat.withinIntersectionBounds(car.getMatPos()):
                     monoInt.mat.matrix[car.getMatPos()] = 3
                 else:
                     monoInt.mat.matrix[car.getMatPos()] = 1

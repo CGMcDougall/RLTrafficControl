@@ -18,9 +18,9 @@ class Actions(Enum):
 #Class that functions as the enviroment
 class IntersectionControl:
 
-    def __init__(self,v: Visual.visuals,size = 50):
+    def __init__(self,v: Visual.visuals,screen_size = 700, mat_size = 14):
         self.lanes = 2
-        self.size = size
+        self.size = mat_size
         self.visual = v
 
         # Since the lights must change in a specific order, I figured I'd just hardcode them in
@@ -31,7 +31,7 @@ class IntersectionControl:
                             LightAction.H_YELLOW, 
                             LightAction.ALL_RED]
 
-        self.mat = mat.storage(700,700,size,self.lanes)
+        self.mat = mat.storage(screen_size,mat_size,self.lanes)
         self.reset()
 
     def reset(self):

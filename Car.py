@@ -18,8 +18,7 @@ class car:
     speed = 0.05
     color = (250,250,250,1)
     driving = True
-    size =20
-
+    size = 20
 
     # Initialize a screen position, matrix location, and direction
     def __init__(self, start_dir):
@@ -28,25 +27,24 @@ class car:
         if start_dir == CarDirs.UP:
             self.Car = pg.Rect(320,0,self.size,self.size)
             self.dir = [0.0,1.0]
-            self.loc = [700/50/2-1,0]
+            self.loc = [14/2-1,0]
         elif start_dir == CarDirs.LEFT:
             self.Car = pg.Rect(0,360,self.size,self.size)
             self.dir = [1.0,0.0]
-            self.loc = [0,700/50/2]
+            self.loc = [0,14/2]
         elif start_dir == CarDirs.RIGHT:
             self.Car = pg.Rect(700,320,self.size,self.size)
             self.dir = [-1.0,0.0]
-            self.loc = [700/50-1,700/50/2-1]
+            self.loc = [14-1,14/2-1]
         elif start_dir == CarDirs.DOWN:
             self.Car = pg.Rect(360,700,self.size,self.size)
             self.dir = [0.0,-1.0]
-            self.loc = [700/50/2,700/50-1]
+            self.loc = [14/2,14-1]
     
     def draw(self,s : pg.surface):
         pg.draw.rect(s,self.color,self.Car)
 
     def act(self, mat : Matricies):
-
 
         if self.driving == False:
             return
@@ -55,15 +53,13 @@ class car:
         # But can look more into that later, also low prio
         self.Car = self.Car.move(self.dir)
         if self.dir[0] == 0:
-            self.loc[1] = Matricies.getAt(mat, self.Car.x, self.Car.y)[1]
+            self.loc[1] = Matricies.cordToIndex(mat, self.Car.x, self.Car.y)[1]
         else:
-            self.loc[0] = Matricies.getAt(mat, self.Car.x, self.Car.y)[0]
+            self.loc[0] = Matricies.cordToIndex(mat, self.Car.x, self.Car.y)[0]
 
     # A function to get clamped (int) value for location in matrix
     def getMatPos(self):
         return int(self.loc[1]), int(self.loc[0])
-
-
 
     def legalMoveCheck(self,mat : Matricies,phase):
 
@@ -78,7 +74,6 @@ class car:
             return False
         return True
 
-
     #If the light is green, or past the light, drive anyway, regardless of light phase
     def MoveRegardless(self, mat, phase) -> bool:
 
@@ -88,10 +83,7 @@ class car:
             return True
 
         #If gets this far, keep driving if in intersection, otherwise stop
-        return mat.withinIntersectionBouds(self.loc)
-
-
-
+        return mat.withinIntersectionBounds(self.loc)
 
     # Stops the car if at an intersections and light phase is not green
     def notAtLight(self,mat,phase):
