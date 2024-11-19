@@ -39,8 +39,9 @@ class storage:
     def withinIntersectionBounds(self,loc) -> bool:
         x = int(loc[0])
         y = int(loc[1])
+        print(self.inter_bound[0],self.inter_bound[1])
 
-        return (self.inter_bound[0] <= x and self.inter_bound[1] > x and self.inter_bound[0] <= y and self.inter_bound[1] > y)
+        return (self.inter_bound[0] <= x and self.inter_bound[1] >= x and self.inter_bound[0] <= y and self.inter_bound[1] >= y)
 
 # Helper Functions
 def indexToCord(self,i,j):

@@ -83,7 +83,7 @@ def main():
                     monoInt.mat.matrix[car.getMatPos()] = 1
                 car.draw(screen)
 
-        print(monoInt.mat.matrix)
+        #print(monoInt.mat.matrix)
         # Update light display
         v.lights(monoInt.action_loop[monoInt.curLight])
 
