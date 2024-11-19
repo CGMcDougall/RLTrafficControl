@@ -30,6 +30,7 @@ def main():
     #Time Setup
     clock = pg.time.Clock()
     oldtime = time.time()
+    light_swap_time = 0
     fps = 60
 
     #Viusal Setup
@@ -43,10 +44,13 @@ def main():
         dt, time_cons = time_consistency(oldtime) # Not a real dt, being used to track time between light switches, should probably be renamed for clarity
         screen.fill(background_colour)
 
+        oldtime = time_cons
+        light_swap_time += dt
+
         # Switch lights every 10 seconds for now
-        if dt >= 1:
+        if light_swap_time >= 1:
             monoInt.curAction = Actions.SWITCH
-            oldtime = time_cons
+            light_swap_time -= 1
         else:
             monoInt.curAction = Actions.STAY
         monoInt.action()
@@ -72,7 +76,7 @@ def main():
                 monoInt.mat.matrix[car.getMatPos()] = 0
 
             car.legalMoveCheck(monoInt.mat, monoInt.action_loop[monoInt.curLight])
-            car.act(monoInt.mat)
+            car.act(monoInt.mat,dt)
 
             if car.loc[0] >= monoInt.mat.mat_size or car.loc[1] >= monoInt.mat.mat_size or car.loc[0] < 0 or car.loc[1] < 0:
                 monoInt.cars.remove(car)
@@ -83,7 +87,7 @@ def main():
                     monoInt.mat.matrix[car.getMatPos()] = 1
                 car.draw(screen)
 
-        #print(monoInt.mat.matrix)
+        print(monoInt.mat.matrix)
         # Update light display
         v.lights(monoInt.action_loop[monoInt.curLight])
 

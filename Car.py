@@ -44,7 +44,7 @@ class car:
     def draw(self,s : pg.surface):
         pg.draw.rect(s,self.color,self.Car)
 
-    def act(self, mat : Matricies):
+    def act(self, mat : Matricies, t : float = 0):
 
         if self.driving == False:
             return
