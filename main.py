@@ -4,6 +4,10 @@ import pygame as pg
 import time, Car
 from Car import CarDirs
 
+from data import Data as pd
+
+
+
 import numpy as np
 from Traffic_env.envs import Matricies as mat
 from Traffic_env.envs import MonoIntersection as env
@@ -30,6 +34,8 @@ def main():
     #Time Setup
     clock = pg.time.Clock()
     oldtime = time.time()
+
+
     light_swap_time = 0
     fps = 60
 
@@ -38,6 +44,9 @@ def main():
 
     #Enviroment SetUp
     monoInt = env.IntersectionControl(v,screen_size,mat_size)
+
+    #Data
+    Data = pd()
 
     while running:
         clock.tick(fps) # This is how it's supposed to be done but may or may not be useful to us
@@ -56,6 +65,10 @@ def main():
         oldtime = time_cons
         monoInt.action()
         monoInt.render()
+
+        #Delete Later
+        if random.randint(0,50) == 1:
+                Data.addToQueue(random.randint(0,5),pg.time.get_ticks()/1000)
 
         # Every frame there's a chance to spawn a car coming from a random direction (CarDirs refers to where it is COMING FROM)
         rand_num = random.randint(0,400)
@@ -100,13 +113,11 @@ def main():
             # if it is quit the game
                 pg.quit()
                 exit(0)
-
-        for event in pg.event.get():
-            # check if the event is the X button
-            if event.type==pg.QUIT:
-                # if it is quit the game
-                pg.quit()
-                exit(0)
+            elif event.type == pg.KEYDOWN:
+                # Check if the Escape key is pressed
+                if event.key == pg.K_ESCAPE:
+                    running = False  # Exit the loop
+                    Data.plot()
 
 if __name__ == "__main__":
     main() # The code beneath with the world env stuff does eventually need to work I think
