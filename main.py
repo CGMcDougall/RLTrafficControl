@@ -53,6 +53,7 @@ def main():
             light_swap_time -= 1
         else:
             monoInt.curAction = Actions.STAY
+        oldtime = time_cons
         monoInt.action()
         monoInt.render()
 
@@ -79,6 +80,7 @@ def main():
             car.act(monoInt.mat,dt)
 
             if car.loc[0] >= monoInt.mat.mat_size or car.loc[1] >= monoInt.mat.mat_size or car.loc[0] < 0 or car.loc[1] < 0:
+                print(car.stoptime)
                 monoInt.cars.remove(car)
             else:
                 if monoInt.mat.withinIntersectionBounds(car.getMatPos()):
@@ -87,7 +89,7 @@ def main():
                     monoInt.mat.matrix[car.getMatPos()] = 1
                 car.draw(screen)
 
-        print(monoInt.mat.matrix)
+        # print(monoInt.mat.matrix)
         # Update light display
         v.lights(monoInt.action_loop[monoInt.curLight])
 

@@ -3,6 +3,7 @@ from enum import Enum
 
 from Traffic_env.envs import Matricies
 import numpy as np
+import time
 
 from Traffic_env.envs.Visual import LightAction
 
@@ -18,7 +19,9 @@ class car:
     speed = 0.05
     color = (250,250,250,1)
     driving = True
-    size = 20
+    size =20
+    stoptime = 0.0
+
 
     # Initialize a screen position, matrix location, and direction
     def __init__(self, start_dir):
@@ -47,6 +50,7 @@ class car:
     def act(self, mat : Matricies, t : float = 0):
 
         if self.driving == False:
+            self.stoptime += t
             return
 
         # Speed and dt are no longer used, which I think is fine because I'm calling tick with an fps in main?
@@ -65,7 +69,6 @@ class car:
 
         l = self.notAtLight(mat,phase)
         i = self.avaliableSpot(mat)
-
         self.driving = (l and i) or (self.MoveRegardless(mat,phase))
 
     #If boardering spot doesnt have a car in it (ie x != 1,4), return true
