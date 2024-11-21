@@ -2,7 +2,6 @@ import pygame as pg
 from enum import Enum
 
 from Traffic_env.envs import Matricies
-from Traffic_env.envs.Matricies import storage 
 import numpy as np
 import time
 
@@ -20,7 +19,7 @@ class car:
     speed = 0.05
     color = (250,250,250,1)
     driving = True
-    size =20
+    size = 20
     stoptime = 0.0
 
 
@@ -49,12 +48,24 @@ class car:
         pg.draw.rect(s,self.color,self.Car)
 
     def act(self, mat : Matricies, t : float = 0):
-        ns_array = storage.ns_array
-        ew_array = storage.ew_array 
+        ns_array = mat.ns_array
+        ew_array = mat.ew_array 
 
         if self.driving == False:
             self.stoptime += t
-            return
+            if (abs(self.dir[0]) == 1 and self not in ew_array):
+                ew_array.append(self)
+            if (abs(self.dir[1]) == 1 and self not in ns_array):
+                ns_array.append(self)
+            return 
+        
+        #car is moving, so if it is in one of the arrays, check if its within intersection bounds 
+        #if so, remove from array 
+        if mat.withinIntersectionBounds(self.loc): 
+            if(self in ew_array):
+                ew_array.remove(self)
+            if(self in ns_array):
+                ns_array.remove(self)
 
         # Speed and dt are no longer used, which I think is fine because I'm calling tick with an fps in main?
         # But can look more into that later, also low prio
@@ -62,7 +73,7 @@ class car:
         if self.dir[0] == 0:
             self.loc[1] = Matricies.cordToIndex(mat, self.Car.x, self.Car.y)[1]
         else:
-            self.loc[0] = Matricies.cordToIndex(mat, self.Car.x, self.Car.y)[0]
+            self.loc[0] = Matricies.cordToIndex(mat, self.Car.x, self.Car.y)[0] 
 
     # A function to get clamped (int) value for location in matrix
     def getMatPos(self):
@@ -82,7 +93,6 @@ class car:
 
     #If the light is green, or past the light, drive anyway, regardless of light phase
     def MoveRegardless(self, mat, phase) -> bool:
-
         if abs(self.dir[0]) == 1 and phase == LightAction.H_GREEN:
             return True
         if abs(self.dir[1]) == 1 and phase == LightAction.V_GREEN:

@@ -89,11 +89,7 @@ def main():
                     monoInt.mat.matrix[car.getMatPos()] = 1
                 car.draw(screen)
 
-<<<<<<< Updated upstream
-        # print(monoInt.mat.matrix)
-=======
         print(mat.storage.ns_array)
->>>>>>> Stashed changes
         # Update light display
         v.lights(monoInt.action_loop[monoInt.curLight])
 
