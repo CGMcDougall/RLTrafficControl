@@ -11,6 +11,9 @@ class Tile(Enum):
     NAN = 4
 
 class storage:
+    #waiting arrays for reward calculation 
+    ns_array = []
+    ew_array = []
     #init storage matrices to track locations of cars with 0,1 values 
     def __init__(self, screen_size = 700, mat_size = 14, Lanes = 2):
         self.lanes = Lanes
@@ -28,6 +31,8 @@ class storage:
             for j in range(self.inter_bound[0], self.inter_bound[1]+1):
                 self.matrix[i,j] = 2
 
+        
+
     def getBordering(self,loc,dir):
         x = int(loc[0] + dir[0])
         y = int(loc[1] + dir[1])
@@ -36,6 +41,7 @@ class storage:
             return 0
 
         return self.matrix[y,x]
+    
     def withinIntersectionBounds(self,loc) -> bool:
         x = int(loc[0])
         y = int(loc[1])
@@ -54,3 +60,4 @@ def cordToIndex(self,i,j):
     y = j / self.pixel_len
 
     return [int(x),int(y)]
+

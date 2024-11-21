@@ -2,6 +2,7 @@ import pygame as pg
 from enum import Enum
 
 from Traffic_env.envs import Matricies
+from Traffic_env.envs.Matricies import storage 
 import numpy as np
 import time
 
@@ -48,6 +49,8 @@ class car:
         pg.draw.rect(s,self.color,self.Car)
 
     def act(self, mat : Matricies, t : float = 0):
+        ns_array = storage.ns_array
+        ew_array = storage.ew_array 
 
         if self.driving == False:
             self.stoptime += t
