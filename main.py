@@ -68,7 +68,7 @@ def main():
 
         #Delete Later
         if random.randint(0,50) == 1:
-                Data.addToQueue(random.randint(0,5),pg.time.get_ticks()/1000)
+                Data.addToQueue(random.randint(0,10),pg.time.get_ticks()/1000)
 
         # Every frame there's a chance to spawn a car coming from a random direction (CarDirs refers to where it is COMING FROM)
         rand_num = random.randint(0,400)
@@ -102,9 +102,16 @@ def main():
                     monoInt.mat.matrix[car.getMatPos()] = 1
                 car.draw(screen)
 
+        #Agent Step/Action shit idk
+
+        monoInt.step()
+
+
         # print(monoInt.mat.matrix)
         # Update light display
         v.lights(monoInt.action_loop[monoInt.curLight])
+
+
 
         pg.display.flip()
         for event in pg.event.get():
@@ -117,6 +124,7 @@ def main():
                 # Check if the Escape key is pressed
                 if event.key == pg.K_ESCAPE:
                     running = False  # Exit the loop
+                    pg.quit()
                     Data.plot()
 
 if __name__ == "__main__":

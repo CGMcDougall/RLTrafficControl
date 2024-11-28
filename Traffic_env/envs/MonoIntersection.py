@@ -10,15 +10,25 @@ import numpy as np
 from Traffic_env.envs import Visual
 from Traffic_env.envs.Visual import LightAction
 
+
 # Possible Actions the agent can take
 class Actions(Enum):
     STAY = 0
     SWITCH = 1
 
 #Class that functions as the enviroment
-class IntersectionControl:
+class IntersectionControl(gym.Env):
+    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 4}
 
-    def __init__(self,v: Visual.visuals,screen_size = 700, mat_size = 14):
+    def __init__(self, v: Visual.visuals,screen_size = 700, mat_size = 14,render_mode=None):
+
+        self.observation_space = spaces.Dict(
+            {
+                "agent": spaces.Box(0, mat_size, shape=(2,), dtype=int)
+            }
+        )
+
+        self.curAction = 0
         self.lanes = 2
         self.size = mat_size
         self.visual = v
@@ -33,6 +43,23 @@ class IntersectionControl:
 
         self.mat = mat.storage(screen_size,mat_size,self.lanes)
         self.reset()
+
+        assert render_mode is None or render_mode in self.metadata["render_modes"]
+        self.render_mode = render_mode
+
+    def _get_obs(self):
+        return
+
+    def step(self,act = 0):
+
+        self.curAction = act
+        self.action()
+
+        terminated = False
+        reward = 0 #self.reward()?
+        obs = self._get_obs()
+
+        return obs, reward, terminated, False
 
     def reset(self):
         self.curAction = Actions.STAY
@@ -49,6 +76,8 @@ class IntersectionControl:
 
     def render(self):
         self.visual.draw()
+
+
 
 ##DEMO main function for small testing, use main usually
 if __name__=="__main__":

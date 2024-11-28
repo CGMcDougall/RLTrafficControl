@@ -15,7 +15,7 @@ class Data:
 
 
     def addToQueue(self,x,time):
-        print((time))
+        #print((x))
         try:
             self.WaitTime[int(math.floor(time))].append(x)
         except:
@@ -28,7 +28,7 @@ class Data:
 
     def plot(self):
 
-        print(self.WaitTime)
+        #print(self.WaitTime)
 
 
         # Step 1: Flatten the matrix into x, y coordinates
@@ -43,12 +43,21 @@ class Data:
 
         plt.figure(figsize=(10, 6))
         #plt.scatter(x, y,c=y)
-        plt.scatter(x, y)
 
+
+        fit = np.polyfit(x, y, 1)
+        fit_fn = np.poly1d(fit)
+
+        plt.scatter(x, y)
+        plt.scatter(x, fit_fn(x))  # orange
+
+        plt.grid()
         plt.ylabel('Car Wait Time')
         plt.xlabel('Time')
         plt.title('Scatter Plot WaitTime')
         plt.autumn()
+
+
 
         plt.show()
 
