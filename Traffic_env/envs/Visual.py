@@ -36,27 +36,27 @@ class visuals:
 
     curLight = None
 
-    def __init__(self,s : pg.surface ,width,height,Size =50, Lanes = 2):
-        self.width = width
-        self.height = height
+    def __init__(self,s : pg.surface , screen_size = 700, mat_size = 14, Lanes = 2):
+        self.screen_size = screen_size
         self.screen = s
-        self.size = Size
+        self.mat_size = mat_size
         self.lanes = Lanes
+        self.tile_size = screen_size/mat_size
 
-    # Numbers need to be updated so that they're not hard coded in 
+    # Numbers need to be updated so that they're not hard coded in
     # But otherwise this works fine as the main render
     def draw(self):
-        for i in range (0,int(self.width/self.size)):
+        for i in range (0,self.mat_size):
             for j in range (0,self.lanes):
-                self.screen.blit(self.road,(i * 50, self.height/2 - 35 + (40 * j)))
+                self.screen.blit(self.road,(i * self.tile_size, self.screen_size/2 - 35 + (40 * j)))
 
-        for i in range (0, int(self.height/self.size)):
+        for i in range (0, self.mat_size):
             for j in range(0,self.lanes):
-                self.screen.blit(self.downRoad,(self.height/2 - 35 + (40 * j), i * 50 ))
+                self.screen.blit(self.downRoad,(self.screen_size/2 - 35 + (40 * j), i * self.tile_size ))
 
-        self.screen.blit(self.Inter, (self.width/2-50, self.height/2-50))
+        self.screen.blit(self.Inter, (self.screen_size/2-self.tile_size, self.screen_size/2-self.tile_size))
         if(self.curLight != None):
-            self.screen.blit(self.curLight,(self.width/2-50, self.height/2-50))
+            self.screen.blit(self.curLight,(self.screen_size/2-self.tile_size, self.screen_size/2-self.tile_size))
 
     # Takes a LightAction, phase and sets the appropirate spirte to be drawn
     def lights(self, phase):
