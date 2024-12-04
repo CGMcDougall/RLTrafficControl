@@ -68,7 +68,6 @@ class IntersectionControl(gym.Env):
         self.render_mode = render_mode
 
         if render_mode != "None" and render_mode != None:
-            print("HEE")
             self.screen = pg.display.set_mode((self.screen_size, self.screen_size))
             self.visual = Visual.visuals(self.screen, self.screen_size, mat_size, Lanes)
             pg.display.set_caption("Lil Traffic Light Fella")
