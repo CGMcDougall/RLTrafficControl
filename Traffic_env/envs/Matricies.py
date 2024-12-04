@@ -80,7 +80,28 @@ class storage:
         return
 
 
-# Potentially useful helper functions - modify and delete as appropriate
+
+
+    #Return the spaces r distance from the intersection (into intersection only)
+    def GetCarsWithinRange(self,r :int = 2):
+        NS = []
+        WE = []
+        low = self.inter_bound[0]
+        high = self.inter_bound[1]
+
+        for i in range(1,r+1):
+            NS.append(self.matrix[low - i, low])
+            NS.append(self.matrix[high + i, high])
+
+            WE.append(self.matrix[high, low - i])
+            WE.append(self.matrix[low, high + i])
+
+
+
+        return NS+WE
+
+
+
 def indexToCord(self,i,j):
     x = i * (self.width / self.xLen) + self.offsetX
     y = j * (self.height / self.yLen) + self.offsetY

@@ -4,6 +4,10 @@ import pygame as pg
 import time, Car
 from Car import CarDirs
 
+from data import Data as pd
+
+
+
 import numpy as np
 from Traffic_env.envs import Matricies as mat
 from Traffic_env.envs import MonoIntersection as env
@@ -16,91 +20,63 @@ def time_consistency(oldtime : float):
     return dt, (oldtime + dt)
 
 def main():
-    #Screen Setup
-    background_colour = (120, 120, 120)
-    (width, height) = (700, 700) # Should probably set this as a const somewhere
-    screen = pg.display.set_mode((width, height))
-    pg.display.set_caption('Demo')
+    # #Screen Setup
+    # background_colour = (120, 120, 120)
+    # screen_size = 700 # Should probably set this as a const somewhere
+    # screen = pg.display.set_mode((screen_size, screen_size))
+    # pg.display.set_caption("Lil Traffic Light Fella")
     running = True
 
     #info setup
-    Size = 50
+    mat_size = 14
     Lanes = 2
 
-    #Time Setup
-    clock = pg.time.Clock()
-    oldtime = time.time()
-    fps = 60
 
     #Viusal Setup
-    v = Visual.visuals(screen,width,height,Size,Lanes)
+    #v = Visual.visuals(screen,screen_size,mat_size,Lanes)
 
     #Enviroment SetUp
-    monoInt = env.IntersectionControl(v,Size)
+    monoInt = env.IntersectionControl(mat_size,Lanes,"human")
+
+    #Data
+    Data = pd()
 
     while running:
-        clock.tick(fps) # This is how it's supposed to be done but may or may not be useful to us
-        dt, time_cons = time_consistency(oldtime) # Not a real dt, being used to track time between light switches, should probably be renamed for clarity
-        screen.fill(background_colour)
 
-        # Switch lights every 10 seconds for now
-        if dt >= 1:
-            monoInt.curAction = Actions.SWITCH
-            oldtime = time_cons
-        else:
-            monoInt.curAction = Actions.STAY
-        monoInt.action()
         monoInt.render()
+        monoInt.action()
 
-        # Every frame there's a chance to spawn a car coming from a random direction (CarDirs refers to where it is COMING FROM)
-        rand_num = random.randint(0,800)
-        if rand_num == 1:
-            monoInt.cars.append(Car.car(CarDirs.UP))
-        elif rand_num == 2:
-            monoInt.cars.append(Car.car(CarDirs.DOWN))
-        elif rand_num == 3:
-            monoInt.cars.append(Car.car(CarDirs.LEFT))
-        elif rand_num == 4:
-            monoInt.cars.append(Car.car(CarDirs.RIGHT))
-        
-        # Loop through every car in existence and move it
-        # Eventually there should be a way to check if a car has moved off screen and delete it
-        for car in monoInt.cars:
-            monoInt.mat.matrix[car.getMatPos()] = 0
+        #Delete Later
+        if random.randint(0,50) == 1:
+                Data.addToQueue(random.randint(0,10),pg.time.get_ticks()/1000)
 
-            car.act(monoInt.mat)
-            car.legalMoveCheck(monoInt.mat,monoInt.action_loop[monoInt.curLight])
+        monoInt.step()
 
 
-
-            if car.loc[0] >= 700/50 or car.loc[1] >= 700/50 or car.loc[0] < 0 or car.loc[1] < 0:
-                monoInt.cars.remove(car)
-            else:
-                monoInt.mat.matrix[car.getMatPos()] = 1
-                car.draw(screen)
-
-        print(monoInt.mat.matrix)
+        # print(monoInt.mat.matrix)
         # Update light display
-        v.lights(monoInt.action_loop[monoInt.curLight])
+        #v.lights(monoInt.action_loop[monoInt.curLight])
 
-        pg.display.flip()
-        for event in pg.event.get():
-        # check if the event is the X button
-            if event.type==pg.QUIT:
-            # if it is quit the game
-                pg.quit()
-                exit(0)
 
-        for event in pg.event.get():
-            # check if the event is the X button
-            if event.type==pg.QUIT:
-                # if it is quit the game
-                pg.quit()
-                exit(0)
+
+        #
+        # for event in pg.event.get():
+        # # check if the event is the X button
+        #     if event.type==pg.QUIT:
+        #     # if it is quit the game
+        #         pg.quit()
+        #         exit(0)
+        #     elif event.type == pg.KEYDOWN:
+        #         # Check if the Escape key is pressed
+        #         if event.key == pg.K_ESCAPE:
+        #             running = False  # Exit the loop
+        #             pg.quit()
+        #             Data.plot()
 
 if __name__ == "__main__":
     main() # The code beneath with the world env stuff does eventually need to work I think
     # Just for project requirements and whatnot, but low prio
+
 
     # e = env.GridWorldEnv("human")
     # while True:
