@@ -75,6 +75,7 @@ class car:
         if self.dir[0] == 0:
             self.loc[1] = Matricies.cordToIndex(mat, self.Car.x, self.Car.y)[1]
         else:
+            self.loc[0] = Matricies.cordToIndex(mat, self.Car.x, self.Car.y)[0] 
 
     # A function to get clamped (int) value for location in matrix
     def getMatPos(self):
