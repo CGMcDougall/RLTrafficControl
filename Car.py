@@ -65,7 +65,7 @@ class car:
         #if so, remove from array 
         if mat.withinIntersectionBounds(self.loc):
 
-            mat.Data.addToQueue(self.stoptime,tot_time)
+            #mat.Data.addToQueue(self.stoptime,tot_time)
             mat.reward_buffer.append(self)
 
             if(self in ew_array):

@@ -69,34 +69,40 @@ def runQLearning(env,max_episode,total_iterations):
         Discount_Factor = np.power(discount_rate, iteration)
         explore = (np.random.uniform(0, 1) <= epsilon)
         if explore:
-            action = np.random.randint(0, env.n_actions)
+            action = np.random.randint(0, env.n_actions-1)
+            #print(action)
         else:
             action = np.argmax(QTable[state])
+            #print(action)
+        #print(QTable[state])
 
-        next_state, reward, terminated, trunc = env.step()
+        next_state, reward, terminated, trunc = env.step(action)
 
         QTable[state,action] = QTable[state,action] + step_size*((discount_rate*reward)+gamma*np.max(QTable[next_state]) - QTable[state,action])
 
-        state = next_state
+        #if(action == 1):
+            #print(reward)
+
+        return next_state
 
 
     QTable = np.zeros((env.n_states, env.n_actions))
-
+    #print(QTable)
 
     for i in range(0,total_iterations):
-
+        print(i)
         state, _ = env.reset()
         for j in range(0,max_episode):
 
-            Learn(env,j,state,gamma=0.9,step_size=0.5,epsilon=0.1,discount_rate=0.99)
+            state = Learn(env,j,state,gamma=0.9,step_size=0.5,epsilon=0.1,discount_rate=0.99)
 
             env.action()
 
-    return QTable
+    return QTable, env.mat.Data.plot()
 
 if __name__=="__main__":
     monoInt = IntersectionControl(mat_size=14, Lanes=2, render_mode="human")
-    q = runQLearning(monoInt,10000,2)
+    q = runQLearning(monoInt,10000,5)
 
     print(q)
 

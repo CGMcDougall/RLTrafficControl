@@ -23,29 +23,31 @@ class Rewards:
 
 
     threshold = 45
-    scale = 1
+    pos_scale = 0.0
+    neg_scale = 0.1
+    buffer_scale = 0.001
     def __init__(self,run_speed):
         self.fps = run_speed
 
 
     def GetReward(self,cur_action:LightAction,buffer:list,ns:list,ew:list):
             tot = 0
-            print("-----------NS:")
+            #print("-----------NS:")
             ns_cars, ns_wait = self.calculate_reward(ns)
-            print("-----------EW:")
+            #print("-----------EW:")
             ew_cars, ew_wait = self.calculate_reward(ew)
 
             if cur_action == LightAction.V_GREEN:
-                tot = self.scale * ((ns_cars * ns_wait) - (ew_cars * ew_wait))
-                tot += self.buffer_reward(buffer)
+                tot = (self.pos_scale * (ns_cars * ns_wait) - self.neg_scale*(ew_cars * ew_wait))
+                #tot += self.buffer_scale * self.buffer_reward(buffer)
             elif cur_action == LightAction.H_GREEN:
-                tot = self.scale * ((ew_cars * ew_wait) - (ns_cars * ns_wait))
-                tot += self.buffer_reward(buffer)
+                tot = (self.pos_scale *(ew_cars * ew_wait) - self.neg_scale*(ns_cars * ns_wait))
+                #tot += self.buffer_scale * self.buffer_reward(buffer)
 
             else:
-                tot  = self.scale * (-(ew_cars * ew_wait) - (ns_cars * ns_wait))
+                tot = 2 * self.neg_scale * (-(ew_cars * ew_wait))
 
-            return tot
+            return tot, (ns_wait + ew_wait)/2
 
 
     def buffer_reward(self,buffer:list):
@@ -66,7 +68,7 @@ class Rewards:
         if car_nums != 0:
             stop_avg = stop_avg/car_nums
         #print("stop then num")
-        print(stop_avg)
-        print(car_nums)
+        #rint(stop_avg)
+        #print(car_nums)
 
         return car_nums, stop_avg

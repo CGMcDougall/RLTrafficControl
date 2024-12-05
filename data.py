@@ -54,9 +54,9 @@ class Data:
         plt.scatter(x, fit_fn(x))  # orange
 
         plt.grid()
-        plt.ylabel('Car Wait Time')
-        plt.xlabel('Time')
-        plt.title('Scatter Plot WaitTime')
+        plt.ylabel('Average Car Wait Time')
+        plt.xlabel('Time (In Frames)')
+        plt.title('Model')
         plt.autumn()
 
 

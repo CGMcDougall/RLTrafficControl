@@ -26,13 +26,14 @@ class Actions(Enum):
 class IntersectionControl(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array","None"], "render_fps": 4}
 
-    run_speed =100 #By increasing FPS, we can increase the speed of the simulation, but some other variables need to updated to work with fps
+    run_speed =10000 #By increasing FPS, we can increase the speed of the simulation, but some other variables need to updated to work with fps
 
 
     # Time Setup
     clock = pg.time.Clock()
     oldtime = time.time()
     tot_time_passsed = 0
+    tot_frames = 0
     screen_size = 700
 
     def __init__(self, mat_size = 14,Lanes = 2, render_mode=None):
@@ -94,13 +95,17 @@ class IntersectionControl(gym.Env):
 
 
         terminated = False
-        reward = self.reward_calc.GetReward(lightPhase,self.mat.reward_buffer,self.mat.ns_array,self.mat.ew_array)
-        #obs = self._get_obs()
-        obs = self.mat.GetCarsWithinRange(2)
+        reward, wait_time = self.reward_calc.GetReward(lightPhase,self.mat.reward_buffer,self.mat.ns_array,self.mat.ew_array)
 
+        self.mat.reward_buffer = []
+
+        self.mat.Data.addToQueue(wait_time,self.tot_frames)
+
+        obs = self.mat.GetCarsWithinRange(2)
+        obs = self.StateToIndex(obs)
         #print(obs)
-        print("REWARD!!:: ")
-        print(reward)
+        #print("REWARD!!:: ")
+        #print(reward)
 
         return obs, reward, terminated, False
 
@@ -112,7 +117,7 @@ class IntersectionControl(gym.Env):
         self.curLight = 0
         self.cars = []
 
-        return [0,0,0,0,0,0,0,0], self.curLight
+        return 0, self.curLight
 
 
     # IF the agent is taking the SWITCH action, swap to next stage of light
@@ -124,6 +129,7 @@ class IntersectionControl(gym.Env):
         self.oldtime = time_cons
 
         self.tot_time_passsed += dt
+        self.tot_frames += 1
 
         self.Env_Act()
         self.CarsDriving(dt)
@@ -150,7 +156,7 @@ class IntersectionControl(gym.Env):
         pg.display.flip()
 
     ##HELPER FUNCTIONS
-    def GetMappingIndex(self, s):
+    def StateToIndex(self, s):
         val = ""
         for i in s:
             val += str(i)
@@ -195,11 +201,11 @@ class IntersectionControl(gym.Env):
         elif rand_num == 4 and self.mat.matrix[int(700 / 50) - 1, int(700 / 50 / 2) - 1] == 0:
             self.cars.append(Car.car(Car.CarDirs.RIGHT))
 
-        rand_num2 = random.randint(0, 400)
-        if rand_num2 == 1:
-            self.curAction = Actions.SWITCH
-        else:
-            self.curAction = Actions.STAY
+        # rand_num2 = random.randint(0, 400)
+        # if rand_num2 == 1:
+        #     self.curAction = Actions.SWITCH
+        # else:
+        #     self.curAction = Actions.STAY
 
     def CarsDriving(self, dt):
 
@@ -213,10 +219,10 @@ class IntersectionControl(gym.Env):
 
             car.legalMoveCheck(self.mat, self.action_loop[self.curLight])
 
-            car.act(self.mat,self.tot_time_passsed,dt)
+            car.act(self.mat,self.tot_frames,dt)
 
             if car.loc[0] >= self.mat.mat_size or car.loc[1] >= self.mat.mat_size or car.loc[0] < 0 or car.loc[1] < 0:
-                print(car.stoptime)
+                #print(car.stoptime)
                 self.cars.remove(car)
             else:
                 if self.mat.withinIntersectionBounds(car.getMatPos()):
