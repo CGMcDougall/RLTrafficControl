@@ -62,14 +62,18 @@ def runQLearning(env,max_episode,total_iterations):
 
     def Learn(env,gamma,step_size,epsilon,iteration,discount_rate=0.99):
 
-        Discount_Factor = np.power(discount_rate, i)
+        Discount_Factor = np.power(discount_rate, iteration)
         explore = (np.random.uniform(0, 1) <= epsilon)
         if explore:
             action = np.random.randint(0, env.n_actions)
         else:
             action = np.argmax(QTable[state])
 
-        
+        next_state, reward, terminated, trunc = env.step()
+
+        QTable[state,action] = QTable[state,action] + step_size*((discount_rate*reward)+gamma*np.max(QTable[next_state]) - QTable[state,action])
+
+        state = next_state
 
 
     QTable = np.zeros((env.n_states, env.n_actions))
@@ -79,11 +83,9 @@ def runQLearning(env,max_episode,total_iterations):
         state, _ = env.reset()
         for j in range(0,max_episode):
             #Do a thing idk
+            Learn(env,gamma,)
 
-            next_state, reward, terminated, trunc = env.step()
 
-
-            state = next_state
 
 
 

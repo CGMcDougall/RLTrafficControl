@@ -14,6 +14,8 @@ class Data:
         return
 
 
+    # x = total wait time of a car
+    # time = the time in which it happened (time step?)
     def addToQueue(self,x,time):
         #print((x))
         try:

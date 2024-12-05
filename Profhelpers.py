@@ -1,4 +1,4 @@
-## CREDIT TO PROF, THANks FOR CODE PROF Jungfeng Wen
+## CREDIT TO PROF, THANKS FOR CODE PROF Junfeng Wen
 import numpy as np
 from scipy.linalg import block_diag
 
