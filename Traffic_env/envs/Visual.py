@@ -43,7 +43,7 @@ class visuals:
         self.lanes = Lanes
         self.tile_size = screen_size/mat_size
 
-    # Numbers need to be updated so that they're not hard coded in 
+    # Numbers need to be updated so that they're not hard coded in
     # But otherwise this works fine as the main render
     def draw(self):
         for i in range (0,self.mat_size):
