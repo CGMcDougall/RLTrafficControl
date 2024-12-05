@@ -31,6 +31,7 @@ class IntersectionControl(gym.Env):
     # Time Setup
     clock = pg.time.Clock()
     oldtime = time.time()
+    tot_time_passsed = 0
     screen_size = 700
 
     def __init__(self, mat_size = 14,Lanes = 2, render_mode=None):
@@ -40,7 +41,7 @@ class IntersectionControl(gym.Env):
         self.n_states = 256
         self.n_actions = 2
         self.to_cell, self.to_state = self.makeStateMapping() ##To_Cell maps binary to State #, To_state maps # to []
-        print(len(self.to_cell))
+        #print(len(self.to_cell))
 
         #print(self.to_state["00100000"])
         #print(self.to_cell[self.to_state["00100000"]])
@@ -103,7 +104,17 @@ class IntersectionControl(gym.Env):
     # IF the agent is taking the SWITCH action, swap to next stage of light
     def action(self):
         self.clock.tick(self.run_speed)  # This is how it's supposed to be done but may or may not be useful to us
+
+        dt, time_cons = self.time_consistency(
+            self.oldtime)  # Not a real dt, being used to track time between light switches, should probably be renamed for clarity
+        self.oldtime = time_cons
+
+        self.tot_time_passsed += dt
+
         self.Env_Act()
+        self.CarsDriving(dt)
+        self.render()
+
 
         if self.curAction == Actions.SWITCH:
             if self.curLight == len(self.action_loop) - 1:
@@ -112,11 +123,16 @@ class IntersectionControl(gym.Env):
                 self.curLight += 1
 
     def render(self):
+
         if self.render_mode == "None" or self.render_mode == None:
             return
         self.screen.fill((120, 120, 120))
         self.visual.draw()
-        self.CarsDrivingVisual(self.screen)
+
+        for car in self.cars:
+            car.draw(self.screen)
+        self.visual.lights(self.action_loop[self.curLight])
+
         pg.display.flip()
 
     ##HELPER FUNCTIONS
@@ -171,11 +187,7 @@ class IntersectionControl(gym.Env):
         else:
             self.curAction = Actions.STAY
 
-    def CarsDrivingVisual(self, screen):
-
-        dt, time_cons = self.time_consistency(
-            self.oldtime)  # Not a real dt, being used to track time between light switches, should probably be renamed for clarity
-        self.oldtime = time_cons
+    def CarsDriving(self, dt):
 
         # Loop through every car in existence and move it
         for car in self.cars:
@@ -186,7 +198,8 @@ class IntersectionControl(gym.Env):
                 self.mat.matrix[car.getMatPos()] = 0
 
             car.legalMoveCheck(self.mat, self.action_loop[self.curLight])
-            car.act(self.mat, dt)
+
+            car.act(self.mat,self.tot_time_passsed,dt)
 
             if car.loc[0] >= self.mat.mat_size or car.loc[1] >= self.mat.mat_size or car.loc[0] < 0 or car.loc[1] < 0:
                 print(car.stoptime)
@@ -196,8 +209,8 @@ class IntersectionControl(gym.Env):
                     self.mat.matrix[car.getMatPos()] = 3
                 else:
                     self.mat.matrix[car.getMatPos()] = 1
-            car.draw(screen)
-        self.visual.lights(self.action_loop[self.curLight])
+
+
 
 
 ##DEMO main function for small testing, use main usually
@@ -212,6 +225,6 @@ if __name__=="__main__":
     monoInt = IntersectionControl(mat_size, Lanes, "human")
 
     while running:
-        monoInt.render()
+        #monoInt.render()
         monoInt.action()
         monoInt.step()

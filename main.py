@@ -43,7 +43,7 @@ def main():
 
     while running:
 
-        monoInt.render()
+        #monoInt.render()
         monoInt.action()
 
         #Delete Later

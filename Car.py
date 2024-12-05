@@ -48,7 +48,7 @@ class car:
     def draw(self, s: pg.surface):
         pg.draw.rect(s, self.color, self.Car)
 
-    def act(self, mat : Matricies, t : float = 0):
+    def act(self, mat : Matricies,tot_time:float, t : float = 0):
         ns_array = mat.ns_array
         ew_array = mat.ew_array 
 
@@ -63,7 +63,10 @@ class car:
         
         #car is moving, so if it is in one of the arrays, check if its within intersection bounds 
         #if so, remove from array 
-        if mat.withinIntersectionBounds(self.loc): 
+        if mat.withinIntersectionBounds(self.loc):
+
+            mat.Data.addToQueue(self.stoptime,tot_time)
+
             if(self in ew_array):
                 ew_array.remove(self)
             if(self in ns_array):
