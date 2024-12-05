@@ -1,7 +1,7 @@
 import numpy as np
 import pygame as pg
 from enum import Enum
-
+from data import Data as pd
 
 ##Possible "tiles" (locations) that the env can have
 class Tile(Enum):
@@ -18,6 +18,7 @@ class storage:
     ns_array = []
     ew_array = []
 
+
     #init storage matrices to track locations of cars with 0,1 values 
     def __init__(self, screen_size = 700, mat_size = 14, Lanes = 2):
 
@@ -25,7 +26,7 @@ class storage:
         self.screen_size = screen_size
         self.mat_size = mat_size
 
-
+        self.Data = pd()
 
         # Pixel lengths
         self.pixel_len = (int(screen_size / self.mat_size))
