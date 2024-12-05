@@ -9,7 +9,7 @@ import Car
 from Traffic_env.envs import Matricies
 import gymnasium as gym
 from gymnasium import spaces
-import rewards as re
+from Traffic_env.envs import rewards as re
 
 import numpy as np
 
@@ -87,7 +87,10 @@ class IntersectionControl(gym.Env):
 
         self.curAction = act
 
-        lightPhase = self.action_loop[self.curLight % 6]
+        if act == 1:
+            self.curLight = (self.curLight + 1) % 6
+
+        lightPhase = self.action_loop[self.curLight]
 
 
         terminated = False
