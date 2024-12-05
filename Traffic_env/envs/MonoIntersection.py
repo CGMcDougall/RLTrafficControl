@@ -25,7 +25,8 @@ class Actions(Enum):
 class IntersectionControl(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array","None"], "render_fps": 4}
 
-    run_speed = 60 #By increasing FPS, we can increase the speed of the simulation, but some other variables need to updated to work with fps
+    run_speed = 6000 #By increasing FPS, we can increase the speed of the simulation, but some other variables need to updated to work with fps
+
 
     # Time Setup
     clock = pg.time.Clock()
@@ -34,20 +35,21 @@ class IntersectionControl(gym.Env):
 
     def __init__(self, mat_size = 14,Lanes = 2, render_mode=None):
 
-        ## If we obseeve the first space before the intersection of every oncoming lane, we would have 2^4 = 16 states
-        ## the first two of every lane would be 2^8 = 256 states
+        ## If we observe the first space before the intersection of every oncoming lane, we would have 2^4 = 16 states
+        ## if we look at the first two of every lane would be 2^8 = 256 states
         self.n_states = 256
         self.n_actions = 2
         self.to_cell, self.to_state = self.makeStateMapping() ##To_Cell maps binary to State #, To_state maps # to []
+        print(len(self.to_cell))
 
-        print(self.to_state["00100000"])
-        print(self.to_cell[self.to_state["00100000"]])
+        #print(self.to_state["00100000"])
+        #print(self.to_cell[self.to_state["00100000"]])
 
-        self.observation_space = spaces.Dict(
-            {
-                "agent": spaces.Box(0, mat_size, shape=(2,), dtype=int)
-            }
-        )
+        # self.observation_space = spaces.Dict(
+        #     {
+        #         "agent": spaces.Box(0, mat_size, shape=(2,), dtype=int)
+        #     }
+        # )
 
         self.curAction = 0
         self.lanes = 2
@@ -88,16 +90,19 @@ class IntersectionControl(gym.Env):
         return obs, reward, terminated, False
 
     def reset(self,seed: Optional[int] = None, options: Optional[dict] = None):
+
+        super().reset(seed=seed)
+
         self.curAction = Actions.STAY
         self.curLight = 0
         self.cars = []
 
-        return [0,0,0,0,0,0,0,0], []
+        return [0,0,0,0,0,0,0,0], self.curLight
 
 
     # IF the agent is taking the SWITCH action, swap to next stage of light
     def action(self):
-
+        self.clock.tick(self.run_speed)  # This is how it's supposed to be done but may or may not be useful to us
         self.Env_Act()
 
         if self.curAction == Actions.SWITCH:
@@ -167,7 +172,7 @@ class IntersectionControl(gym.Env):
             self.curAction = Actions.STAY
 
     def CarsDrivingVisual(self, screen):
-        self.clock.tick(self.run_speed)  # This is how it's supposed to be done but may or may not be useful to us
+
         dt, time_cons = self.time_consistency(
             self.oldtime)  # Not a real dt, being used to track time between light switches, should probably be renamed for clarity
         self.oldtime = time_cons
