@@ -2,6 +2,8 @@ import Profhelpers as ph
 from Traffic_env.envs import MonoIntersection as MI
 import numpy as np
 
+from Traffic_env.envs.MonoIntersection import IntersectionControl
+
 
 ##IDK ABOUT THIS TBH,
 def basicGreedPolicy(env, q):
@@ -60,7 +62,8 @@ def QLearning(env,gamma,step_size,epsilon,discount_rate=0.99,max_episode=1000):
 
 def runQLearning(env,max_episode,total_iterations):
 
-    def Learn(env,gamma,step_size,epsilon,iteration,discount_rate=0.99):
+
+    def Learn(env, iteration, gamma, step_size, epsilon, discount_rate=0.99):
 
         Discount_Factor = np.power(discount_rate, iteration)
         explore = (np.random.uniform(0, 1) <= epsilon)
@@ -78,12 +81,21 @@ def runQLearning(env,max_episode,total_iterations):
 
     QTable = np.zeros((env.n_states, env.n_actions))
 
+
     for i in range(0,total_iterations):
 
         state, _ = env.reset()
         for j in range(0,max_episode):
-            #Do a thing idk
-            Learn(env,gamma,)
+
+            Learn(env,j,gamma=0.9,step_size=0.5,epsilon=0.1,discount_rate=0.99)
+
+            env.monoInt.action()
+
+
+
+if __name__=="__main__":
+    #monoInt = IntersectionControl(mat_size, Lanes, "human")
+    runQLearning()
 
 
 

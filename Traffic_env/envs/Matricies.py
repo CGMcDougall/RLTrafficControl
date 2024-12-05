@@ -17,7 +17,7 @@ class storage:
     # init storage matrices to track locations of cars with 0,1 values
     ns_array = []
     ew_array = []
-
+    reward_buffer = []      #Matrix to store the cars that have passed through this frame
 
     #init storage matrices to track locations of cars with 0,1 values 
     def __init__(self, screen_size = 700, mat_size = 14, Lanes = 2):
@@ -59,6 +59,16 @@ class storage:
 
         return (self.inter_bound[0] <= x and self.inter_bound[1] >= x and self.inter_bound[0] <= y and self.inter_bound[1] >= y)
 
+    def GetCarsWithinRange(self,r : int = 2):
+        all = []
+        for i in range(1,r+1):
+            all.append(self.matrix[self.inter_bound[0]-i,self.inter_bound[0]])
+            all.append(self.matrix[self.inter_bound[1]+i, self.inter_bound[1]])
+
+            all.append(self.matrix[self.inter_bound[1], self.inter_bound[0]-i])
+            all.append(self.matrix[self.inter_bound[0] + i, self.inter_bound[1]+i])
+
+        return all
 
 # Helper Functions
 def indexToCord(self, i, j):

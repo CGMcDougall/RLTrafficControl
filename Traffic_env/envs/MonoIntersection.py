@@ -6,9 +6,10 @@ from typing import Optional
 import pygame as pg
 
 import Car
-from Traffic_env.envs import Matricies as mat
+from Traffic_env.envs import Matricies
 import gymnasium as gym
 from gymnasium import spaces
+import rewards as re
 
 import numpy as np
 
@@ -25,7 +26,7 @@ class Actions(Enum):
 class IntersectionControl(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array","None"], "render_fps": 4}
 
-    run_speed = 6000 #By increasing FPS, we can increase the speed of the simulation, but some other variables need to updated to work with fps
+    run_speed =100 #By increasing FPS, we can increase the speed of the simulation, but some other variables need to updated to work with fps
 
 
     # Time Setup
@@ -43,6 +44,8 @@ class IntersectionControl(gym.Env):
         self.to_cell, self.to_state = self.makeStateMapping() ##To_Cell maps binary to State #, To_state maps # to []
         #print(len(self.to_cell))
 
+        self.reward_calc = re.Rewards(self.run_speed)
+
         #print(self.to_state["00100000"])
         #print(self.to_cell[self.to_state["00100000"]])
 
@@ -57,6 +60,7 @@ class IntersectionControl(gym.Env):
         self.size = mat_size
 
         # Since the lights must change in a specific order, I figured I'd just hardcode them in
+        self.curLight = 0
         self.action_loop = [LightAction.V_GREEN,
                             LightAction.V_YELLOW,
                             LightAction.ALL_RED,
@@ -64,7 +68,7 @@ class IntersectionControl(gym.Env):
                             LightAction.H_YELLOW,
                             LightAction.ALL_RED]
 
-        self.mat = mat.storage(self.screen_size,mat_size,self.lanes)
+        self.mat = Matricies.storage(self.screen_size,mat_size,self.lanes)
         self.reset()
 
         assert render_mode is None or render_mode in self.metadata["render_modes"]
@@ -83,10 +87,17 @@ class IntersectionControl(gym.Env):
 
         self.curAction = act
 
+        lightPhase = self.action_loop[self.curLight % 6]
+
 
         terminated = False
-        reward = 0.5 #self.reward()?
-        obs = self._get_obs()
+        reward = self.reward_calc.GetReward(lightPhase,self.mat.reward_buffer,self.mat.ns_array,self.mat.ew_array)
+        #obs = self._get_obs()
+        obs = self.mat.GetCarsWithinRange(2)
+
+        #print(obs)
+        print("REWARD!!:: ")
+        print(reward)
 
         return obs, reward, terminated, False
 
