@@ -53,7 +53,7 @@ def main():
         monoInt.step()
 
 
-        # print(monoInt.mat.matrix)
+        print(mat.storage.ns_array)
         # Update light display
         #v.lights(monoInt.action_loop[monoInt.curLight])
 
