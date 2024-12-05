@@ -25,7 +25,7 @@ class Actions(Enum):
 class IntersectionControl(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array","None"], "render_fps": 4}
 
-    run_speed = 6000 #By increasing FPS, we can increase the speed of the simulation, but some other variables need to updated to work with fps
+    run_speed = 60 #By increasing FPS, we can increase the speed of the simulation, but some other variables need to updated to work with fps
 
     # Time Setup
     clock = pg.time.Clock()
