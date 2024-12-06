@@ -45,31 +45,25 @@ class car:
             self.dir = [0.0, -1.0]
             self.loc = [14 / 2, 14 - 1]
 
+
     def draw(self, s: pg.surface):
         pg.draw.rect(s, self.color, self.Car)
 
-<<<<<<< Updated upstream
-    def act(self, mat: Matricies, t: float = 0):
-=======
     def act(self, mat : Matricies,tot_time:float, t : float = 0):
         ns_array = mat.ns_array
         ew_array = mat.ew_array
->>>>>>> Stashed changes
 
         ##IF NOT DRIVING
         if self.driving == False:
             self.stoptime += t
-<<<<<<< Updated upstream
-            return
-=======
             if (abs(self.dir[0]) == 1 and self not in ew_array):
                 ew_array.append(self)
             if (abs(self.dir[1]) == 1 and self not in ns_array):
                 ns_array.append(self)
-            return 
-        
-        #car is moving, so if it is in one of the arrays, check if its within intersection bounds 
-        #if so, remove from array 
+            return
+
+        #car is moving, so if it is in one of the arrays, check if its within intersection bounds
+        #if so, remove from array
         if mat.withinIntersectionBounds(self.loc):
             self.keep_drive = True
 
@@ -80,7 +74,6 @@ class car:
                 ew_array.remove(self)
             if(self in ns_array):
                 ns_array.remove(self)
->>>>>>> Stashed changes
 
         # Speed and dt are no longer used, which I think is fine because I'm calling tick with an fps in main?
         # But can look more into that later, also low prio
@@ -108,7 +101,6 @@ class car:
 
     # If the light is green, or past the light, drive anyway, regardless of light phase
     def MoveRegardless(self, mat, phase) -> bool:
-
         if abs(self.dir[0]) == 1 and phase == LightAction.H_GREEN:
             return True
         if abs(self.dir[1]) == 1 and phase == LightAction.V_GREEN:

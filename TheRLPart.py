@@ -3,6 +3,9 @@ from Traffic_env.envs import MonoIntersection as MI
 import numpy as np
 
 
+from Traffic_env.envs.MonoIntersection import IntersectionControl
+
+
 ##IDK ABOUT THIS TBH,
 def basicGreedPolicy(env, q):
     pi = []
@@ -60,21 +63,11 @@ def QLearning(env,gamma,step_size,epsilon,discount_rate=0.99,max_episode=1000):
 
 def runQLearning(env,max_episode,total_iterations):
 
-    def Learn(env,gamma,step_size,epsilon,iteration,discount_rate=0.99):
 
-        Discount_Factor = np.power(discount_rate, i)
+    def Learn(env, iteration,state,gamma, step_size, epsilon, discount_rate=0.99):
+
+        Discount_Factor = np.power(discount_rate, iteration)
         explore = (np.random.uniform(0, 1) <= epsilon)
-<<<<<<< Updated upstream
-        if explore:
-            action = np.random.randint(0, env.n_actions)
-        else:
-            action = np.argmax(QTable[state])
-
-        
-
-
-    QTable = np.zeros((env.n_states, env.n_actions))
-=======
 
 
         forced, a = env.forcedAction()
@@ -104,17 +97,12 @@ def runQLearning(env,max_episode,total_iterations):
 
     QTable = np.zeros((env.n_states, env.n_actions))
 
->>>>>>> Stashed changes
 
     for i in range(0,total_iterations):
-
+        print(i)
         state, _ = env.reset()
         for j in range(0,max_episode):
-            #Do a thing idk
 
-<<<<<<< Updated upstream
-            next_state, reward, terminated, trunc = env.step()
-=======
             state = Learn(env,j,state,gamma=0.9,step_size=0.5,epsilon=0.01,discount_rate=0.99)
 
             env.action()
@@ -126,10 +114,8 @@ if __name__=="__main__":
     q = runQLearning(monoInt,10000,20)
 
     print(q)
->>>>>>> Stashed changes
 
 
-            state = next_state
 
 
 
