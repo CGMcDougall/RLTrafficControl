@@ -24,7 +24,7 @@ class Actions(IntEnum):
 
 #Class that functions as the enviroment
 class IntersectionControl(gym.Env):
-    metadata = {"render_modes": ["human", "rgb_array","None"], "render_fps": 4}
+    metadata = {"render_modes": ["human", "rgb_array","None"], "render_fps": 50}
 
     run_speed =6000 #By increasing FPS, we can increase the speed of the simulation, but some other variables need to updated to work with fps
 
@@ -38,7 +38,7 @@ class IntersectionControl(gym.Env):
 
     def __init__(self, mat_size = 14,Lanes = 2, render_mode=None):
 
-        self.SightRange = 3 # How many spots do we look at   np.np.power(discount_rate, iteration)
+        self.SightRange = 2 # How many spots do we look at   np.np.power(discount_rate, iteration)
 
         ## If we observe the first space before the intersection of every oncoming lane, we would have 2^4 = 16 states
         ## if we look at the first two of every lane would be 2^8 = 256 states
@@ -66,11 +66,11 @@ class IntersectionControl(gym.Env):
 
         # Since the lights must change in a specific order, I figured I'd just hardcode them in
 
-        self.switch_countdown_base = self.run_speed/100
+        self.switch_countdown_base = self.run_speed/500
         self.switch_countdown = self.switch_countdown_base
 
         self.curAction = 0
-        self.ActionIndex = 0
+        self.ActionIndex = 3
         self.action_loop = [LightAction.V_GREEN,
                             LightAction.V_YELLOW,
                             LightAction.ALL_RED,
@@ -95,18 +95,25 @@ class IntersectionControl(gym.Env):
 
     def step(self,act = 0):
 
+
         #self.curAction = act
+        # forced, a = self.forcedAction()
+        #if forced:
+
+
 
         self.switch_countdown += 1
+        self.curAction = act
+        if self.curAction == 1:
+            self.ActionIndex = (self.ActionIndex + 1) % 6
 
-        if self.switch_countdown > self.switch_countdown_base:
-
-
-            if act != self.curAction:
-                self.curAction = act
-                self.switch_countdown = 0
-                if self.curAction == 1:
-                    self.ActionIndex = (self.ActionIndex + 1) % 6
+        # if self.switch_countdown > self.switch_countdown_base:
+        #
+        #     if act != self.curAction:
+        #         self.curAction = act
+        #         self.switch_countdown = 0
+        #         if self.curAction == 1:
+        #             self.ActionIndex = (self.ActionIndex + 1) % 6
 
 
         # if act == 1:
@@ -128,6 +135,7 @@ class IntersectionControl(gym.Env):
         self.mat.Data.addToQueue(wait_time,self.tot_frames)
 
         obs = self.mat.GetCarsWithinRange(self.SightRange)
+        #print(obs)
         obs = self.StateToIndex(obs)
         #print(obs)
         #print("REWARD!!:: ")
@@ -223,15 +231,15 @@ class IntersectionControl(gym.Env):
     def Env_Act(self):
 
         ##TEMPORARY
-        rand_num = random.randint(0, 400)
-        if rand_num == 1 and self.mat.matrix[int(700 / 50 / 2) - 1, 0] == 0:
+        rand_num = random.randint(0, 500)
+        if rand_num < 2 and self.mat.matrix[int(700 / 50 / 2) - 1, 0] == 0:
             self.cars.append(Car.car(Car.CarDirs.UP))
-        elif rand_num == 2 and self.mat.matrix[int(700 / 50 / 2), int(700 / 50) - 1] == 0:
+        elif rand_num < 4 and self.mat.matrix[int(700 / 50 / 2), int(700 / 50) - 1] == 0:
             self.cars.append(Car.car(Car.CarDirs.DOWN))
-        # elif rand_num == 3 and self.mat.matrix[0, int(700 / 50 / 2)] == 0:
-        #     self.cars.append(Car.car(Car.CarDirs.LEFT))
-        # elif rand_num == 4 and self.mat.matrix[int(700 / 50) - 1, int(700 / 50 / 2) - 1] == 0:
-        #     self.cars.append(Car.car(Car.CarDirs.RIGHT))
+        elif rand_num == 5 and self.mat.matrix[0, int(700 / 50 / 2)] == 0:
+            self.cars.append(Car.car(Car.CarDirs.LEFT))
+        elif rand_num == 6 and self.mat.matrix[int(700 / 50) - 1, int(700 / 50 / 2) - 1] == 0:
+            self.cars.append(Car.car(Car.CarDirs.RIGHT))
 
         # rand_num2 = random.randint(0, 400)
         # if rand_num2 == 1:

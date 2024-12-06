@@ -23,9 +23,9 @@ class Rewards:
 
 
     threshold = 45
-    pos_scale = 0.5
-    neg_scale = 0.5
-    buffer_scale = 1.5
+    pos_scale = 1.5
+    neg_scale = 1.5
+    buffer_scale = 3
     def __init__(self,run_speed):
         self.fps = run_speed
 
@@ -45,11 +45,13 @@ class Rewards:
                 tot = (self.pos_scale * (ns_cars * ns_wait) - self.neg_scale*(ew_cars * ew_wait))
                 tot += self.buffer_scale * self.buffer_reward(buffer)
             elif cur_action == LightAction.H_GREEN:
-                tot = (self.pos_scale *(ew_cars * ew_wait) - self.neg_scale*(ns_cars * ns_wait))
+                tot = (self.pos_scale * (ew_cars * ew_wait) - self.neg_scale*(ns_cars * ns_wait))
                 tot += self.buffer_scale * self.buffer_reward(buffer)
 
+            elif cur_action == LightAction.H_YELLOW or cur_action == LightAction.V_YELLOW:
+                tot = 0.01 * self.neg_scale * (-(ew_cars * ew_wait) - (ns_wait * ns_cars))
             else:
-                tot = 0.0001 * self.neg_scale * (-(ew_cars * ew_wait))
+                tot = 0.1 * self.neg_scale * (-(ew_cars * ew_wait) - (ns_wait * ns_cars))
 
             return tot, (ns_wait + ew_wait)/2
 

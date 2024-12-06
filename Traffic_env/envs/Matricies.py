@@ -66,7 +66,8 @@ class storage:
             all.append(self.matrix[self.inter_bound[1]+i, self.inter_bound[1]])
 
             all.append(self.matrix[self.inter_bound[1], self.inter_bound[0]-i])
-            all.append(self.matrix[self.inter_bound[0] + i, self.inter_bound[1]+i])
+
+            all.append(self.matrix[self.inter_bound[0], self.inter_bound[1]+i])
 
         return all
 

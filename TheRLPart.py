@@ -26,6 +26,7 @@ def basicGreedPolicy(env, q):
 ##3QLearnign maybe idk
 def QLearning(env,gamma,step_size,epsilon,discount_rate=0.99,max_episode=1000):
 
+
     QTable = np.zeros((env.n_states, env.n_actions))
     state = 0
 
@@ -61,7 +62,7 @@ def QLearning(env,gamma,step_size,epsilon,discount_rate=0.99,max_episode=1000):
 
 
 
-def runQLearning(env,max_episode,total_iterations):
+def runQLearning(env,max_episode,total_iterations,basePolicy = []):
 
 
     def Learn(env, iteration,state,gamma, step_size, epsilon, discount_rate=0.99):
@@ -69,33 +70,23 @@ def runQLearning(env,max_episode,total_iterations):
         Discount_Factor = np.power(discount_rate, iteration)
         explore = (np.random.uniform(0, 1) <= epsilon)
 
-
-        forced, a = env.forcedAction()
-        #print(forced)
-
-
-        if forced:
-            action = int(a)
-        elif explore:
+        if explore:
             action = np.random.randint(0, env.n_actions)
         else:
             action = np.argmax(QTable[state])
-            #print(action)
-        #print(QTable[state])
-        # if action == 0:
-        #     print(action)
 
         next_state, reward, terminated, trunc = env.step(action)
 
         QTable[state,action] = QTable[state,action] + step_size*((Discount_Factor*reward)+gamma*np.max(QTable[next_state]) - QTable[state,action])
-        #print(QTable)
-        #if(action == 1):
-            #print(reward)
 
         return next_state
 
+    if len(basePolicy) != 0:
+        QTable = basePolicy
+    else:
+        QTable = np.zeros((env.n_states, env.n_actions))
 
-    QTable = np.zeros((env.n_states, env.n_actions))
+    #QTable = np.zeros((env.n_states, env.n_actions))
 
 
     for i in range(0,total_iterations):
@@ -103,17 +94,30 @@ def runQLearning(env,max_episode,total_iterations):
         state, _ = env.reset()
         for j in range(0,max_episode):
 
+            env.action()
             state = Learn(env,j,state,gamma=0.9,step_size=0.5,epsilon=0.01,discount_rate=0.99)
 
-            env.action()
 
-    return QTable, env.mat.Data.plot()
+
+    return QTable, env.mat.Data
 
 if __name__=="__main__":
     monoInt = IntersectionControl(mat_size=14, Lanes=2, render_mode="None")
-    q = runQLearning(monoInt,10000,20)
+    q , d = runQLearning(monoInt,100000,50)
+    #print(q)
+    f = open("QTable.txt","w")
 
-    print(q)
+    for x in q:
+        s = ' '.join(str(xs) for xs in x) + "\n"
+        f.write(s)
+    #f.writelines(q)
+    f.close()
+
+
+    d.plot()
+
+
+
 
 
 
