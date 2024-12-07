@@ -26,7 +26,7 @@ class Actions(IntEnum):
 class IntersectionControl(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array","None"], "render_fps": 50}
 
-    run_speed =6000 #By increasing FPS, we can increase the speed of the simulation, but some other variables need to updated to work with fps
+    run_speed = 6000 #By increasing FPS, we can increase the speed of the simulation, but some other variables need to updated to work with fps
 
 
     # Time Setup
@@ -38,7 +38,7 @@ class IntersectionControl(gym.Env):
 
     def __init__(self, mat_size = 14,Lanes = 2, render_mode=None):
 
-        self.SightRange = 2 # How many spots do we look at   np.np.power(discount_rate, iteration)
+        self.SightRange = 3 # How many spots do we look at   np.np.power(discount_rate, iteration)
 
         ## If we observe the first space before the intersection of every oncoming lane, we would have 2^4 = 16 states
         ## if we look at the first two of every lane would be 2^8 = 256 states
@@ -128,7 +128,7 @@ class IntersectionControl(gym.Env):
 
 
         terminated = False
-        reward, wait_time = self.reward_calc.GetReward(lightPhase,self.mat.reward_buffer,self.mat.ns_array,self.mat.ew_array)
+        reward, wait_time = self.reward_calc.GetReward(lightPhase,self.curAction,self.mat.reward_buffer,self.mat.ns_array,self.mat.ew_array)
 
         self.mat.reward_buffer = []
 

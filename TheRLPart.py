@@ -27,7 +27,7 @@ def basicGreedPolicy(env, q):
 def QLearning(env,gamma,step_size,epsilon,discount_rate=0.99,max_episode=1000):
 
 
-    QTable = np.zeros((env.n_states, env.n_actions))
+    QTable = np.random.rand((env.n_states, env.n_actions))
     state = 0
 
     for i in range(0,max_episode):
@@ -103,7 +103,7 @@ def runQLearning(env,max_episode,total_iterations,basePolicy = []):
 
 if __name__=="__main__":
     monoInt = IntersectionControl(mat_size=14, Lanes=2, render_mode="None")
-    q , d = runQLearning(monoInt,100000,50)
+    q, d = runQLearning(monoInt,100000,50)
     #print(q)
     f = open("QTable.txt","w")
 
@@ -113,6 +113,8 @@ if __name__=="__main__":
     #f.writelines(q)
     f.close()
 
+    monoInt2 = IntersectionControl(mat_size=14, Lanes=2, render_mode="human")
+    q1, _ = runQLearning(monoInt2, 10000, 1,q)
 
     d.plot()
 
