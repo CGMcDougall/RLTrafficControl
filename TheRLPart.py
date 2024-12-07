@@ -6,21 +6,45 @@ import numpy as np
 from Traffic_env.envs.MonoIntersection import IntersectionControl
 
 
-##IDK ABOUT THIS TBH,
-def basicGreedPolicy(env, q):
-    pi = []
-    for i in range(env.n_states):
-        max = np.argmax(q[i])
-        l = [0, 0, 0, 0]
-        l[max] = 1
-        pi += [l]
+## SARSA
+def sarsa(env,gamma,step_size,epsilon,max_episode=20, ep_iterations=50000):
 
-    pi = np.array(pi)
+    def chooseAction(state):
+        explore = (np.random.uniform(0, 1) <= epsilon)
 
-    Pi = ph.diagonalization(pi, env.n_states, env.n_actions)
+        if explore:
+            action = np.random.randint(0, env.n_actions)
+        else:
+            action = np.argmax(q[state])
+        return action
 
-    return Pi
+    q = np.random.rand(env.n_states, env.n_actions)
+    #q[env.goal] = np.zeros((env.n_actions)) 
+    
 
+    for i in range(max_episode):
+        state, _ = env.reset() 
+        action = chooseAction(state)
+        print(i)
+        for j in range(ep_iterations):
+            #take step
+            
+            new_state, reward, terminated, trunc = env.step(action)
+            env.action()
+
+            #choose new action based on new_state using epsilon greedy policy
+            new_action = chooseAction(new_state)
+
+            #note for report: removing discount factor helped calm variability/spikes
+
+            #calculation
+            q[state,action] = q[state,action] + step_size*(reward+(gamma*q[new_state,new_action]-q[state,action]))
+            
+            state = new_state
+            action = new_action
+
+
+    return q, env.mat.Data
 
 
 ##3QLearnign maybe idk
@@ -102,6 +126,7 @@ def runQLearning(env,max_episode,total_iterations,basePolicy = []):
     return QTable, env.mat.Data
 
 if __name__=="__main__":
+    """
     monoInt = IntersectionControl(mat_size=14, Lanes=2, render_mode="None")
     q , d = runQLearning(monoInt,100000,50)
     #print(q)
@@ -115,6 +140,20 @@ if __name__=="__main__":
 
 
     d.plot()
+    """
+    monoInt = IntersectionControl(mat_size = 14, Lanes=2, render_mode="None")
+    q, d =  sarsa(monoInt,gamma=0.9,step_size=1,epsilon=0.05)
+    f = open("QT.txt", "w")
+
+    for x in q:
+        s = ' '.join(str(xs) for xs in x) + "\n"
+        f.write(s)
+    f.close()
+
+
+    d.plot()
+
+    
 
 
 

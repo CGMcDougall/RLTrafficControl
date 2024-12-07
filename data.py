@@ -45,12 +45,12 @@ class Data:
         #plt.scatter(x[2000:], y[2000:],c=y[2000:])
 
 
-        fit = np.polyfit(x[25000:], y[25000:], 1)
-        fit_fn = np.poly1d(fit)
+        #fit = np.polyfit(x[25000:], y[25000:], 1)
+        #fit_fn = np.poly1d(fit)
 
         plt.scatter(x, y)
 
-        plt.scatter(x[25000:], fit_fn(x[25000:]))  # orange
+        #plt.scatter(x[25000:], fit_fn(x[25000:]))  # orange
 
         plt.grid()
         plt.ylabel('Car Wait Time')
