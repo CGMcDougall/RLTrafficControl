@@ -6,61 +6,43 @@ import numpy as np
 from Traffic_env.envs.MonoIntersection import IntersectionControl
 
 
-##IDK ABOUT THIS TBH,
-def basicGreedPolicy(env, q):
-    pi = []
-    for i in range(env.n_states):
-        max = np.argmax(q[i])
-        l = [0, 0, 0, 0]
-        l[max] = 1
-        pi += [l]
-
-    pi = np.array(pi)
-
-    Pi = ph.diagonalization(pi, env.n_states, env.n_actions)
-
-    return Pi
-
-
-
-##3QLearnign maybe idk
-def QLearning(env,gamma,step_size,epsilon,discount_rate=0.99,max_episode=1000):
-
-
-    QTable = np.random.rand((env.n_states, env.n_actions))
-    state = 0
-
-    for i in range(0,max_episode):
-
-        Discount_Factor = np.power(discount_rate,i)
-
+## SARSA
+def sarsa(env, gamma, step_size, epsilon, max_episode=20, ep_iterations=50000):
+    def chooseAction(state):
         explore = (np.random.uniform(0, 1) <= epsilon)
 
         if explore:
             action = np.random.randint(0, env.n_actions)
         else:
-            action = np.argmax(QTable[state])
+            action = np.argmax(q[state])
+        return action
 
+    q = np.random.rand(env.n_states, env.n_actions)
+    # q[env.goal] = np.zeros((env.n_actions))
 
-        ##Observe results from step
-        next_state, reward, terminated, trunc = env.step()
+    for i in range(max_episode):
+        state, _ = env.reset()
+        action = chooseAction(state)
+        print(i)
+        for j in range(ep_iterations):
+            # take step
 
-        #Qlearning math
-        original_val = QTable[state,action]
+            new_state, reward, terminated, trunc = env.step(action)
+            env.action()
 
-        new_max = np.argmax(QTable[next_state])
+            # choose new action based on new_state using epsilon greedy policy
+            new_action = chooseAction(new_state)
 
-        ##Discount Rate required for continuous tasks
-        new_reward = ((reward * Discount_Factor) + gamma * QTable[next_state][new_max])
+            # note for report: removing discount factor helped calm variability/spikes
 
-        QTable[state,action] = original_val + step_size * (new_reward - original_val)
+            # calculation
+            q[state, action] = q[state, action] + step_size * (reward +
+                                                               (gamma * q[new_state, new_action] - q[state, action]))
 
-        state = next_state
+            state = new_state
+            action = new_action
 
-    return basicGreedPolicy(env,QTable), QTable
-
-
-
+    return q, env.mat.Data
 
 def runQLearning(env,max_episode,total_iterations,basePolicy = []):
 
@@ -95,7 +77,7 @@ def runQLearning(env,max_episode,total_iterations,basePolicy = []):
         for j in range(0,max_episode):
 
             env.action()
-            state = Learn(env,j,state,gamma=0.9,step_size=0.5,epsilon=0.01,discount_rate=0.99)
+            state = Learn(env,j,state,gamma=0.9,step_size=0.9,epsilon=0.01,discount_rate=0.99)
 
 
 
@@ -103,18 +85,18 @@ def runQLearning(env,max_episode,total_iterations,basePolicy = []):
 
 if __name__=="__main__":
     monoInt = IntersectionControl(mat_size=14, Lanes=2, render_mode="None")
-    q, d = runQLearning(monoInt,100000,50)
+    q, d = runQLearning(monoInt,1000000,15)
     #print(q)
-    f = open("QTable.txt","w")
+    # f = open("QTable.txt","w")
+    #
+    # for x in q:
+    #     s = ' '.join(str(xs) for xs in x) + "\n"
+    #     f.write(s)
+    # #f.writelines(q)
+    # f.close()
 
-    for x in q:
-        s = ' '.join(str(xs) for xs in x) + "\n"
-        f.write(s)
-    #f.writelines(q)
-    f.close()
-
-    monoInt2 = IntersectionControl(mat_size=14, Lanes=2, render_mode="human")
-    q1, _ = runQLearning(monoInt2, 10000, 1,q)
+    # monoInt2 = IntersectionControl(mat_size=14, Lanes=2, render_mode="human")
+    # q1, _ = runQLearning(monoInt2, 10000, 1,q)
 
     d.plot()
 

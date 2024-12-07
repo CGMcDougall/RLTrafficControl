@@ -22,6 +22,11 @@ class Actions(IntEnum):
     STAY = 0
     SWITCH = 1
 
+class Lights(IntEnum):
+    GREEN_NS = 0
+    GREEN_SE = 1
+    RED = 2
+
 #Class that functions as the enviroment
 class IntersectionControl(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array","None"], "render_fps": 50}
@@ -216,10 +221,12 @@ class IntersectionControl(gym.Env):
             for c in val:
                 temp.append(int(c))
 
+            #for l in range(0,3):
             StateList.append(temp)
-            mapping[(val)] = i
+            mapping[val] = i
 
         flipped_mapping = {v: k for k, v in mapping.items()}  # maps state # to binary number (i hope)
+        print(mapping)
         return flipped_mapping, mapping
 
 
