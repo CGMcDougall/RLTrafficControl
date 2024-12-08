@@ -8,6 +8,6 @@ if __name__=="__main__":
 
     #Sarsa
     #monoInt = IntersectionControl(mat_size=14, Lanes=2, render_mode="None")
-    #q, d = sarsa(monoInt, gamma=0.9, step_size=0.9, epsilon=0.05)
+    #q, d = TheRLPart.sarsa(monoInt, gamma=0.9, step_size=0.9, epsilon=0.05)
 
     d.plot()
