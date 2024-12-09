@@ -226,7 +226,7 @@ class IntersectionControl(gym.Env):
             mapping[val] = i
 
         flipped_mapping = {v: k for k, v in mapping.items()}  # maps state # to binary number (i hope)
-        print(mapping)
+
         return flipped_mapping, mapping
 
 

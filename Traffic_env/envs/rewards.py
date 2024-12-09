@@ -22,9 +22,9 @@ from Traffic_env.envs.Visual import LightAction
 class Rewards:
 
 
-    threshold = 45
-    pos_scale = 1
-    neg_scale = 0.5
+    #threshold = 45
+    pos_scale = 2
+    neg_scale = 1.5
     buffer_scale = 9
     def __init__(self,run_speed):
         self.fps = run_speed
@@ -74,16 +74,16 @@ class Rewards:
         # ew_wait += 1
 
         if cur_action == LightAction.V_GREEN:
-            tot = (self.pos_scale * (ns_wait) - self.neg_scale * (ew_cars * ew_wait))
+            tot = (self.pos_scale * (ns_wait*ns_cars) - self.neg_scale * (ew_cars * ew_wait))
             tot += self.buffer_scale * self.buffer_reward(buffer)
         elif cur_action == LightAction.H_GREEN:
             tot = (self.pos_scale * (ew_cars * ew_wait) - self.neg_scale * (ns_cars * ns_wait))
             tot += self.buffer_scale * self.buffer_reward(buffer)
 
-        # elif cur_action == LightAction.H_YELLOW or cur_action == LightAction.V_YELLOW:
-        #     tot = (1-act) * self.neg_scale * (-(ew_cars * ew_wait) - (ns_wait * ns_cars))
+        elif cur_action == LightAction.H_YELLOW or cur_action == LightAction.V_YELLOW:
+             tot = 0.01 * self.neg_scale * (-(ew_cars * ew_wait) - (ns_wait * ns_cars))
         else:
-            tot = (1-act) * self.neg_scale * (-(ew_cars * ew_wait) - (ns_wait * ns_cars))
+            tot = 0.001 * self.neg_scale * (-(ew_cars * ew_wait) - (ns_wait * ns_cars))
 
         return tot, (ns_wait + ew_wait) / 2
 

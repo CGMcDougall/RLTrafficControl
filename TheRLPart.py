@@ -1,4 +1,4 @@
-import Profhelpers as ph
+
 from Traffic_env.envs import MonoIntersection as MI
 import numpy as np
 
@@ -77,28 +77,28 @@ def runQLearning(env,max_episode,total_iterations,basePolicy = []):
         for j in range(0,max_episode):
 
             env.action()
-            state = Learn(env,j,state,gamma=0.9,step_size=0.9,epsilon=0.01,discount_rate=0.99)
+            state = Learn(env,j,state,gamma=0.9,step_size=0.7,epsilon=0.01,discount_rate=0.99)
 
 
 
     return QTable, env.mat.Data
 
-if __name__=="__main__":
-    monoInt = IntersectionControl(mat_size=14, Lanes=2, render_mode="None")
-    q, d = runQLearning(monoInt,1000000,15)
-    #print(q)
-    # f = open("QTable.txt","w")
-    #
-    # for x in q:
-    #     s = ' '.join(str(xs) for xs in x) + "\n"
-    #     f.write(s)
-    # #f.writelines(q)
-    # f.close()
-
-    # monoInt2 = IntersectionControl(mat_size=14, Lanes=2, render_mode="human")
-    # q1, _ = runQLearning(monoInt2, 10000, 1,q)
-
-    d.plot()
+# if __name__=="__main__":
+#     monoInt = IntersectionControl(mat_size=14, Lanes=2, render_mode="human")
+#     q, d = runQLearning(monoInt,1000000,30)
+#     #print(q)
+#     # f = open("QTable.txt","w")
+#     #
+#     # for x in q:
+#     #     s = ' '.join(str(xs) for xs in x) + "\n"
+#     #     f.write(s)
+#     # #f.writelines(q)
+#     # f.close()
+#
+#     # monoInt2 = IntersectionControl(mat_size=14, Lanes=2, render_mode="human")
+#     # q1, _ = runQLearning(monoInt2, 10000, 1,q)
+#
+#     d.plot()
 
 
 
