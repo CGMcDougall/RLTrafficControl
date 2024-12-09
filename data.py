@@ -1,6 +1,5 @@
 import math
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
 
 class Data:
@@ -44,14 +43,15 @@ class Data:
 
 
         plt.figure(figsize=(10, 6))
-        #plt.scatter(x, y,c=y)
+        #plt.scatter(x[2000:], y[2000:],c=y[2000:])
 
 
-        fit = np.polyfit(x, y, 1)
-        fit_fn = np.poly1d(fit)
+        # fit = np.polyfit(x[25000:], y[25000:], 1)
+        # fit_fn = np.poly1d(fit)
 
         plt.scatter(x, y)
-        plt.scatter(x, fit_fn(x))  # orange
+
+        #plt.scatter(x[25000:], fit_fn(x[25000:]))  # orange
 
         plt.grid()
         plt.ylabel('Average Car Wait Time')

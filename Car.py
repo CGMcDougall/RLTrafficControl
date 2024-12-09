@@ -22,6 +22,7 @@ class car:
     driving = True
     size = 20
     stoptime = 0.0
+    keep_drive = False
 
     # Initialize a screen position, matrix location, and direction
     def __init__(self, start_dir):
@@ -50,20 +51,23 @@ class car:
 
     def act(self, mat : Matricies,tot_time:float, t : float = 0):
         ns_array = mat.ns_array
-        ew_array = mat.ew_array 
+        ew_array = mat.ew_array
 
+        self.stoptime += t
 
+        ##IF NOT DRIVING
         if self.driving == False:
-            self.stoptime += t
+
             if (abs(self.dir[0]) == 1 and self not in ew_array):
                 ew_array.append(self)
             if (abs(self.dir[1]) == 1 and self not in ns_array):
                 ns_array.append(self)
-            return 
-        
-        #car is moving, so if it is in one of the arrays, check if its within intersection bounds 
-        #if so, remove from array 
+            return
+
+        #car is moving, so if it is in one of the arrays, check if its within intersection bounds
+        #if so, remove from array
         if mat.withinIntersectionBounds(self.loc):
+            self.keep_drive = True
 
             #mat.Data.addToQueue(self.stoptime,tot_time)
             mat.reward_buffer.append(self)
@@ -75,11 +79,11 @@ class car:
 
         # Speed and dt are no longer used, which I think is fine because I'm calling tick with an fps in main?
         # But can look more into that later, also low prio
-        self.Car = self.Car.move(self.dir)
+        self.Car = self.Car.move(self.dir[0]* 3, self.dir[1] *3)
         if self.dir[0] == 0:
             self.loc[1] = Matricies.cordToIndex(mat, self.Car.x, self.Car.y)[1]
         else:
-            self.loc[0] = Matricies.cordToIndex(mat, self.Car.x, self.Car.y)[0] 
+            self.loc[0] = Matricies.cordToIndex(mat, self.Car.x, self.Car.y)[0]
 
     # A function to get clamped (int) value for location in matrix
     def getMatPos(self):
@@ -105,7 +109,7 @@ class car:
             return True
 
         # If gets this far, keep driving if in intersection, otherwise stop
-        return mat.withinIntersectionBounds(self.loc)
+        return self.keep_drive
 
     # Stops the car if at an intersections and light phase is not green
     def notAtLight(self, mat, phase):

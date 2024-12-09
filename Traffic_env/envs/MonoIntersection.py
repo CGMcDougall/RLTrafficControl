@@ -1,6 +1,6 @@
 import random
 import time
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import Optional
 
 import pygame as pg
@@ -18,15 +18,20 @@ from Traffic_env.envs.Visual import LightAction
 
 
 # Possible Actions the agent can take
-class Actions(Enum):
+class Actions(IntEnum):
     STAY = 0
     SWITCH = 1
 
+class Lights(IntEnum):
+    GREEN_NS = 0
+    GREEN_SE = 1
+    RED = 2
+
 #Class that functions as the enviroment
 class IntersectionControl(gym.Env):
-    metadata = {"render_modes": ["human", "rgb_array","None"], "render_fps": 4}
+    metadata = {"render_modes": ["human", "rgb_array","None"], "render_fps": 50}
 
-    run_speed =10000 #By increasing FPS, we can increase the speed of the simulation, but some other variables need to updated to work with fps
+    run_speed = 6000 #By increasing FPS, we can increase the speed of the simulation, but some other variables need to updated to work with fps
 
 
     # Time Setup
@@ -38,12 +43,16 @@ class IntersectionControl(gym.Env):
 
     def __init__(self, mat_size = 14,Lanes = 2, render_mode=None):
 
+        self.SightRange = 3 # How many spots do we look at   np.np.power(discount_rate, iteration)
+
         ## If we observe the first space before the intersection of every oncoming lane, we would have 2^4 = 16 states
         ## if we look at the first two of every lane would be 2^8 = 256 states
-        self.n_states = 256
+        self.n_states = np.power(2, (self.SightRange * 4))
         self.n_actions = 2
         self.to_cell, self.to_state = self.makeStateMapping() ##To_Cell maps binary to State #, To_state maps # to []
         #print(len(self.to_cell))
+
+
 
         self.reward_calc = re.Rewards(self.run_speed)
 
@@ -56,12 +65,17 @@ class IntersectionControl(gym.Env):
         #     }
         # )
 
-        self.curAction = 0
+
         self.lanes = 2
         self.size = mat_size
 
         # Since the lights must change in a specific order, I figured I'd just hardcode them in
-        self.curLight = 0
+
+        self.switch_countdown_base = self.run_speed/500
+        self.switch_countdown = self.switch_countdown_base
+
+        self.curAction = 0
+        self.ActionIndex = 3
         self.action_loop = [LightAction.V_GREEN,
                             LightAction.V_YELLOW,
                             LightAction.ALL_RED,
@@ -86,22 +100,47 @@ class IntersectionControl(gym.Env):
 
     def step(self,act = 0):
 
+
+        #self.curAction = act
+        # forced, a = self.forcedAction()
+        #if forced:
+
+
+
+        self.switch_countdown += 1
         self.curAction = act
+        if self.curAction == 1:
+            self.ActionIndex = (self.ActionIndex + 1) % 6
 
-        if act == 1:
-            self.curLight = (self.curLight + 1) % 6
+        # if self.switch_countdown > self.switch_countdown_base:
+        #
+        #     if act != self.curAction:
+        #         self.curAction = act
+        #         self.switch_countdown = 0
+        #         if self.curAction == 1:
+        #             self.ActionIndex = (self.ActionIndex + 1) % 6
 
-        lightPhase = self.action_loop[self.curLight]
+
+        # if act == 1:
+        #     if self.switch_countdown > self.switch_countdown_base:
+        #         self.ActionIndex = (self.ActionIndex + 1) % 6
+        #         self.switch_countdown = 0
+        # elif self.switch_countdown > self.switch_countdown_base:
+        #     self.switch_countdown = 0
+
+
+        lightPhase = self.action_loop[self.ActionIndex]
 
 
         terminated = False
-        reward, wait_time = self.reward_calc.GetReward(lightPhase,self.mat.reward_buffer,self.mat.ns_array,self.mat.ew_array)
+        reward, wait_time = self.reward_calc.GetReward(lightPhase,self.curAction,self.mat.reward_buffer,self.mat.ns_array,self.mat.ew_array)
 
         self.mat.reward_buffer = []
 
         self.mat.Data.addToQueue(wait_time,self.tot_frames)
 
-        obs = self.mat.GetCarsWithinRange(2)
+        obs = self.mat.GetCarsWithinRange(self.SightRange)
+        #print(obs)
         obs = self.StateToIndex(obs)
         #print(obs)
         #print("REWARD!!:: ")
@@ -109,15 +148,21 @@ class IntersectionControl(gym.Env):
 
         return obs, reward, terminated, False
 
+    #If switched in last x time, force agent to have action 1 (AKA SWITCH action)
+    def forcedAction(self):
+        if self.switch_countdown <= self.switch_countdown_base:
+            return True, self.curAction
+        return False, 0
+
     def reset(self,seed: Optional[int] = None, options: Optional[dict] = None):
 
         super().reset(seed=seed)
 
         self.curAction = Actions.STAY
-        self.curLight = 0
+        self.ActionIndex = 0
         self.cars = []
 
-        return 0, self.curLight
+        return 0, self.curAction
 
 
     # IF the agent is taking the SWITCH action, swap to next stage of light
@@ -136,11 +181,11 @@ class IntersectionControl(gym.Env):
         self.render()
 
 
-        if self.curAction == Actions.SWITCH:
-            if self.curLight == len(self.action_loop) - 1:
-                self.curLight = 0
-            else:
-                self.curLight += 1
+        # if self.curAction == Actions.SWITCH:
+        #     if self.ActionIndex == len(self.action_loop) - 1:
+        #         self.ActionIndex = 0
+        #     else:
+        #         self.ActionIndex += 1
 
     def render(self):
 
@@ -151,7 +196,7 @@ class IntersectionControl(gym.Env):
 
         for car in self.cars:
             car.draw(self.screen)
-        self.visual.lights(self.action_loop[self.curLight])
+        self.visual.lights(self.action_loop[self.ActionIndex])
 
         pg.display.flip()
 
@@ -171,15 +216,17 @@ class IntersectionControl(gym.Env):
         ##Dictinary mapping
         for i in range(self.n_states):
             val = str(bin(i)[2:])
-            val = val.zfill(8)
+            val = val.zfill(self.SightRange * 4)
             temp = []
             for c in val:
                 temp.append(int(c))
 
+            #for l in range(0,3):
             StateList.append(temp)
-            mapping[(val)] = i
+            mapping[val] = i
 
         flipped_mapping = {v: k for k, v in mapping.items()}  # maps state # to binary number (i hope)
+
         return flipped_mapping, mapping
 
 
@@ -191,14 +238,14 @@ class IntersectionControl(gym.Env):
     def Env_Act(self):
 
         ##TEMPORARY
-        rand_num = random.randint(0, 400)
-        if rand_num == 1 and self.mat.matrix[int(700 / 50 / 2) - 1, 0] == 0:
+        rand_num = random.randint(0, 500)
+        if rand_num < 2 and self.mat.matrix[int(700 / 50 / 2) - 1, 0] == 0:
             self.cars.append(Car.car(Car.CarDirs.UP))
-        elif rand_num == 2 and self.mat.matrix[int(700 / 50 / 2), int(700 / 50) - 1] == 0:
+        elif rand_num < 4 and self.mat.matrix[int(700 / 50 / 2), int(700 / 50) - 1] == 0:
             self.cars.append(Car.car(Car.CarDirs.DOWN))
-        elif rand_num == 3 and self.mat.matrix[0, int(700 / 50 / 2)] == 0:
+        elif rand_num == 5 and self.mat.matrix[0, int(700 / 50 / 2)] == 0:
             self.cars.append(Car.car(Car.CarDirs.LEFT))
-        elif rand_num == 4 and self.mat.matrix[int(700 / 50) - 1, int(700 / 50 / 2) - 1] == 0:
+        elif rand_num == 6 and self.mat.matrix[int(700 / 50) - 1, int(700 / 50 / 2) - 1] == 0:
             self.cars.append(Car.car(Car.CarDirs.RIGHT))
 
         # rand_num2 = random.randint(0, 400)
@@ -217,9 +264,9 @@ class IntersectionControl(gym.Env):
             else:
                 self.mat.matrix[car.getMatPos()] = 0
 
-            car.legalMoveCheck(self.mat, self.action_loop[self.curLight])
+            car.legalMoveCheck(self.mat, self.action_loop[self.ActionIndex])
 
-            car.act(self.mat,self.tot_frames,dt)
+            car.act(self.mat,self.tot_frames,1)
 
             if car.loc[0] >= self.mat.mat_size or car.loc[1] >= self.mat.mat_size or car.loc[0] < 0 or car.loc[1] < 0:
                 #print(car.stoptime)

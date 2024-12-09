@@ -30,3 +30,16 @@ For Setting up Pipx and Copier, I ran the following (Windows): <br>
 **Install Copier using pipx:**
 
 5. *pip install copier* <br>
+
+**Install Numpy**
+6. *pip install numpy*
+
+## Run
+
+To run, launch the main method. QLearning is the algorithm by default, 
+but can be swapped to Sarsa by commenting out QLearning 
+and uncommenting Sarsa. After the selected amount of episodes a 
+graph should load to show average wait time over time. 
+A visualization can be enabled by making render_mode = "human", 
+but is not recommended for large episodes.<br><br>
+**Warning:** <br>Clicking the graph, or the visualization will likely cause it to crash. Avoid clicking the graph before it finishes loading. 
